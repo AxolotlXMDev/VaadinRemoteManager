@@ -18,7 +18,9 @@ import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
+import github.axolotl.vaadinremotemanager.util.SystemStatusService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
+import github.axolotl.vaadinremotemanager.vo.SystemStatusDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -32,10 +34,7 @@ public class DashboardView extends VerticalLayout {
         setSizeFull();
 
         DashboardViewTest(
-                new SystemStatus(
-                        45.5, 8.0, 16.0, 50.0, 100.0, 200.0, 50.0,
-                        10.0, 20.0, "2025-06-14 23:00:00"
-                ),
+                SystemStatusService.getSystemStatusDO(),
                 List.of(
                         new ProcessInfo("Process1", 1234, 10.5, 100.0),
                         new ProcessInfo("Process2", 5678, 20.0, 200.0)
@@ -48,7 +47,7 @@ public class DashboardView extends VerticalLayout {
         );
     }
 
-    public void DashboardViewTest(SystemStatus systemStatus, List<ProcessInfo> runningProcesses,
+    public void DashboardViewTest(SystemStatusDO systemStatus, List<ProcessInfo> runningProcesses,
                                   List<Activity> recentActivities, Component content) {
         // 1. 创建顶部标题和刷新按钮
         HorizontalLayout header = new HorizontalLayout(
@@ -59,24 +58,22 @@ public class DashboardView extends VerticalLayout {
         header.setJustifyContentMode(JustifyContentMode.BETWEEN);
         header.setAlignItems(Alignment.CENTER);
 
-        Span lastUpdated = new Span("最后更新: " + systemStatus.getLastUpdated());
+        Span lastUpdated = new Span("最后更新: " + systemStatus.getDate());
         header.add(lastUpdated);
 
 // 在DashboardViewTest方法中修改statsRow的创建
 // 2. 创建状态卡片行
         HorizontalLayout statsRow = new HorizontalLayout(
-                createStatCard("CPU 使用率", systemStatus.getCpuUsage() + "%", VaadinIcon.COG, systemStatus.getCpuUsage()),
-                createStatCard("内存使用", systemStatus.getMemoryUsed() + " GB / " + systemStatus.getMemoryTotal() + " GB", VaadinIcon.DATABASE, systemStatus.getMemoryPercentage()),
-                createStatCard("磁盘使用", systemStatus.getDiskUsed() + " GB / " + systemStatus.getDiskTotal() + " GB", VaadinIcon.CALC, systemStatus.getDiskPercentage()),
-                createStatCard("网络流量", systemStatus.getNetworkIn() + " MB/s ↑\n" + systemStatus.getNetworkOut() + " MB/s ↓", VaadinIcon.GLOBE, null)
-        );
+                createStatCard("CPU 使用率", String.format("%.2f%%", systemStatus.getCpuLoad()), VaadinIcon.COG, systemStatus.getCpuLoad()),
+                createStatCard("内存使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedMemory(), systemStatus.getTotalMemory()), VaadinIcon.DATABASE, systemStatus.getMemoryLoad()),
+                createStatCard("磁盘使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedDisk(), systemStatus.getTotalDisk()), VaadinIcon.CALC, systemStatus.getDiskUsagePercent()),
+                createStatCard("网络流量", String.format("%.2f KB/s ↑\n%.2f KB/s ↓", systemStatus.getNetworkUplink(), systemStatus.getNetworkDownlink()), VaadinIcon.GLOBE, null) );
         statsRow.setWidthFull();
         statsRow.setSpacing(true); // 添加卡片间距
         statsRow.addClassName(LumoUtility.FlexWrap.WRAP); // 允许在小屏幕上换行
 
 
         statsRow.setWidthFull();
-
 
 
 // 在整体布局中添加间距
