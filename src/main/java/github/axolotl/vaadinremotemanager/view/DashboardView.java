@@ -1,32 +1,168 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.card.Card;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoUtility;
+import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-/**
- * @author AxolotlXM
- * @version 1.0
- * @since 2025/6/14 22:59
- */
+import java.util.List;
+
 @Route("/")
 public class DashboardView extends VerticalLayout {
     public DashboardView() {
-        HorizontalLayout horizontalLayout = ViewUtil.getDrawerToggle();
-        add(horizontalLayout);
-
+        setPadding(true);
+        setSpacing(true);
         setSizeFull();
-        setPadding(false);
-        setSpacing(false);
-        addClassName("dashboard-view");
 
-        add(new H1("Dashboard View"));
+        DashboardViewTest(
+                new SystemStatus(
+                        45.5, 8.0, 16.0, 50.0, 100.0, 200.0, 50.0,
+                        10.0, 20.0, "2025-06-14 23:00:00"
+                ),
+                List.of(
+                        new ProcessInfo("Process1", 1234, 10.5, 100.0),
+                        new ProcessInfo("Process2", 5678, 20.0, 200.0)
+                ),
+                List.of(
+                        new Activity("用户登录", "2025-06-14 22:59"),
+                        new Activity("文件上传", "2025-06-14 23:00")
+                ),
+                this
+        );
     }
 
+    public void DashboardViewTest(SystemStatus systemStatus, List<ProcessInfo> runningProcesses,
+                                  List<Activity> recentActivities, Component content) {
+        // 1. 创建顶部标题和刷新按钮
+        HorizontalLayout header = new HorizontalLayout(
+                new H2("系统概览"),
+                new Button("刷新", VaadinIcon.REFRESH.create())
+        );
+        header.setWidthFull();
+        header.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        header.setAlignItems(Alignment.CENTER);
 
+        Span lastUpdated = new Span("最后更新: " + systemStatus.getLastUpdated());
+        header.add(lastUpdated);
+
+// 在DashboardViewTest方法中修改statsRow的创建
+// 2. 创建状态卡片行
+        HorizontalLayout statsRow = new HorizontalLayout(
+                createStatCard("CPU 使用率", systemStatus.getCpuUsage() + "%", VaadinIcon.COG, systemStatus.getCpuUsage()),
+                createStatCard("内存使用", systemStatus.getMemoryUsed() + " GB / " + systemStatus.getMemoryTotal() + " GB", VaadinIcon.DATABASE, systemStatus.getMemoryPercentage()),
+                createStatCard("磁盘使用", systemStatus.getDiskUsed() + " GB / " + systemStatus.getDiskTotal() + " GB", VaadinIcon.CALC, systemStatus.getDiskPercentage()),
+                createStatCard("网络流量", systemStatus.getNetworkIn() + " MB/s ↑\n" + systemStatus.getNetworkOut() + " MB/s ↓", VaadinIcon.GLOBE, null)
+        );
+        statsRow.setWidthFull();
+        statsRow.setSpacing(true); // 添加卡片间距
+        statsRow.addClassName(LumoUtility.FlexWrap.WRAP); // 允许在小屏幕上换行
+
+
+        statsRow.setWidthFull();
+
+
+
+// 在整体布局中添加间距
+        VerticalLayout mainContent = new VerticalLayout(
+                header,
+                statsRow
+        );
+        mainContent.setSpacing(true);
+        mainContent.setPadding(true); // 添加内边距
+
+        mainContent.setSizeFull();
+
+        if (content instanceof HasComponents) {
+            ((HasComponents) content).add(mainContent);
+        } else {
+            add(mainContent);
+        }
+    }
+
+    private Card createStatCard(String title, String value, VaadinIcon iconType, Double percentage) {
+        // 创建Card组件
+        Card card = new Card();
+        card.setWidthFull();
+
+//        // 标题行
+        Div header = new Div();
+        header.getStyle()
+                .set("display", "flex")
+                .set("justify-content", "space-between")
+                .set("align-items", "center");
+        Span titleSpan = new Span(title);
+        Icon icon = iconType.create();
+        header.add(titleSpan, icon);
+
+        card.setTitle(header);
+
+        // 数值显示
+        Div subTitleDiv = new Div();
+        subTitleDiv.getStyle()
+                .set("margin", "var(--lumo-space-s) 0")
+                .set("font-size", "var(--lumo-font-size-xl)")
+                .set("font-weight", "600");
+        subTitleDiv.add(ElementUtil.allowNewLine(new Span(value)));
+        // 进度条（如果有）
+        if (percentage != null) {
+            ProgressBar progressBar = new ProgressBar();
+            progressBar.setValue(percentage / 100.0);
+            progressBar.getStyle()
+                    .set("margin-top", "var(--lumo-space-xs)")
+                    .set("height", "6px")
+                    .set("border-radius", "3px");
+            subTitleDiv.add(progressBar);
+        }
+        card.setSubtitle(subTitleDiv);
+
+        return card;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class SystemStatus {
+        private double cpuUsage;
+        private double memoryUsed;
+        private double memoryTotal;
+        private double memoryPercentage;
+        private double diskUsed;
+        private double diskTotal;
+        private double diskPercentage;
+        private double networkIn;
+        private double networkOut;
+        private String lastUpdated;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class ProcessInfo {
+        private String name;
+        private int pid;
+        private double cpu;
+        private double memory;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class Activity {
+        private String description;
+        private String time;
+    }
 }
