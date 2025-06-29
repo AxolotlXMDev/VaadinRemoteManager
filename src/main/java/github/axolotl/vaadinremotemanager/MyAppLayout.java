@@ -12,6 +12,7 @@ import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.view.AboutUsView;
 import github.axolotl.vaadinremotemanager.view.DashboardView;
+import github.axolotl.vaadinremotemanager.view.ProcessView;
 
 
 /**
@@ -25,7 +26,7 @@ import github.axolotl.vaadinremotemanager.view.DashboardView;
 public class MyAppLayout extends AppLayout {
 
     public MyAppLayout() {
-
+        VaadinRemoteManagerApplication.setLastAccessTime(System.currentTimeMillis());
 
         SideNav nav = createSideNav();
 
@@ -46,11 +47,13 @@ public class MyAppLayout extends AppLayout {
         SideNav nav = new SideNav();
 
         SideNavItem dashboardLink = new SideNavItem("仪表盘", DashboardView.class, VaadinIcon.DASHBOARD.create());
+        SideNavItem processLink = new SideNavItem("进程管理", ProcessView.class, VaadinIcon.DASHBOARD.create());
         SideNavItem vaadinLink = new SideNavItem("关于我们", AboutUsView.class, VaadinIcon.VAADIN_H.create());
 
 
-        nav.addItem(dashboardLink,
-//                inboxLink,
+        nav.addItem(
+                dashboardLink,
+                processLink,
 //                calendarLink,
 //                settingsLink,
                 vaadinLink);
