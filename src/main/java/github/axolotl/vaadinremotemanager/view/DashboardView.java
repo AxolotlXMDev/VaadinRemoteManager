@@ -35,20 +35,11 @@ public class DashboardView extends VerticalLayout {
 
         DashboardViewTest(
                 SystemStatusService.getSystemStatusDO(),
-                List.of(
-                        new ProcessInfo("Process1", 1234, 10.5, 100.0),
-                        new ProcessInfo("Process2", 5678, 20.0, 200.0)
-                ),
-                List.of(
-                        new Activity("用户登录", "2025-06-14 22:59"),
-                        new Activity("文件上传", "2025-06-14 23:00")
-                ),
                 this
         );
     }
 
-    public void DashboardViewTest(SystemStatusDO systemStatus, List<ProcessInfo> runningProcesses,
-                                  List<Activity> recentActivities, Component content) {
+    public void DashboardViewTest(SystemStatusDO systemStatus, VerticalLayout content) {
         // 1. 创建顶部标题和刷新按钮
         HorizontalLayout header = new HorizontalLayout(
                 new H2("系统概览"),
@@ -61,13 +52,13 @@ public class DashboardView extends VerticalLayout {
         Span lastUpdated = new Span("最后更新: " + systemStatus.getDate());
         header.add(lastUpdated);
 
-// 在DashboardViewTest方法中修改statsRow的创建
-// 2. 创建状态卡片行
+        // 在DashboardViewTest方法中修改statsRow的创建
+        // 2. 创建状态卡片行
         HorizontalLayout statsRow = new HorizontalLayout(
                 createStatCard("CPU 使用率", String.format("%.2f%%", systemStatus.getCpuLoad()), VaadinIcon.COG, systemStatus.getCpuLoad()),
                 createStatCard("内存使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedMemory(), systemStatus.getTotalMemory()), VaadinIcon.DATABASE, systemStatus.getMemoryLoad()),
                 createStatCard("磁盘使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedDisk(), systemStatus.getTotalDisk()), VaadinIcon.CALC, systemStatus.getDiskUsagePercent()),
-                createStatCard("网络流量", String.format("%.2f KB/s ↑\n%.2f KB/s ↓", systemStatus.getNetworkUplink(), systemStatus.getNetworkDownlink()), VaadinIcon.GLOBE, null) );
+                createStatCard("网络流量", String.format("%.2f KB/s ↑\n%.2f KB/s ↓", systemStatus.getNetworkUplink(), systemStatus.getNetworkDownlink()), VaadinIcon.GLOBE, null));
         statsRow.setWidthFull();
         statsRow.setSpacing(true); // 添加卡片间距
         statsRow.addClassName(LumoUtility.FlexWrap.WRAP); // 允许在小屏幕上换行
@@ -76,7 +67,7 @@ public class DashboardView extends VerticalLayout {
         statsRow.setWidthFull();
 
 
-// 在整体布局中添加间距
+        // 在整体布局中添加间距
         VerticalLayout mainContent = new VerticalLayout(
                 header,
                 statsRow
@@ -86,11 +77,7 @@ public class DashboardView extends VerticalLayout {
 
         mainContent.setSizeFull();
 
-        if (content instanceof HasComponents) {
-            ((HasComponents) content).add(mainContent);
-        } else {
-            add(mainContent);
-        }
+        content.add(mainContent);
     }
 
     private Card createStatCard(String title, String value, VaadinIcon iconType, Double percentage) {

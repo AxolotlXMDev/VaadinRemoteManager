@@ -10,9 +10,7 @@ import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
-import github.axolotl.vaadinremotemanager.view.AboutUsView;
-import github.axolotl.vaadinremotemanager.view.DashboardView;
-import github.axolotl.vaadinremotemanager.view.ProcessView;
+import github.axolotl.vaadinremotemanager.view.*;
 
 
 /**
@@ -46,17 +44,14 @@ public class MyAppLayout extends AppLayout {
     private static SideNav createSideNav() {
         SideNav nav = new SideNav();
 
-        SideNavItem dashboardLink = new SideNavItem("仪表盘", DashboardView.class, VaadinIcon.DASHBOARD.create());
-        SideNavItem processLink = new SideNavItem("进程管理", ProcessView.class, VaadinIcon.DASHBOARD.create());
-        SideNavItem vaadinLink = new SideNavItem("关于我们", AboutUsView.class, VaadinIcon.VAADIN_H.create());
-
-
         nav.addItem(
-                dashboardLink,
-                processLink,
-//                calendarLink,
-//                settingsLink,
-                vaadinLink);
+                new SideNavItem("仪表盘", DashboardView.class, VaadinIcon.DASHBOARD.create()),
+                new SideNavItem("所有进程管理", ProcessView.class, VaadinIcon.OFFICE.create()),
+                new SideNavItem("终端管理", TerminalView.class, VaadinIcon.TERMINAL.create()),
+                new SideNavItem("模板管理", TemplateView.class, VaadinIcon.PANEL.create()),
+                new SideNavItem("设置", SettingView.class, VaadinIcon.HEADSET.create()),
+                new SideNavItem("关于我们", AboutUsView.class, VaadinIcon.ABACUS.create())
+        );
         return nav;
     }
 
