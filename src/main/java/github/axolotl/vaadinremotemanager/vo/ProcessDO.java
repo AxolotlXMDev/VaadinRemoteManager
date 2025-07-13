@@ -17,5 +17,6 @@ public class ProcessDO {
     private double cpuUsage; // CPU使用率
     private double memoryUsage; // 内存占用
     private OSProcess.State status; // 进程状态
+    private OSProcess osProcess; // 进程
 
 }

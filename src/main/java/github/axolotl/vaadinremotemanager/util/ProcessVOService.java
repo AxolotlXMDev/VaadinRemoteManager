@@ -57,7 +57,8 @@ public class ProcessVOService {
                         process.getProcessID(),      // 进程ID
                         process.getProcessCpuLoadBetweenTicks(process) / totalCpuUsage, // CPU使用率
                         process.getResidentSetSize() / (1024.0 * 1024.0), // 内存占用(MB)
-                        process.getState()           // 进程状态
+                        process.getState(),           // 进程状态
+                        process
                 ))
                 .sorted(Comparator.comparingDouble(ProcessDO::getMemoryUsage).reversed())
                 .collect(Collectors.toList());
