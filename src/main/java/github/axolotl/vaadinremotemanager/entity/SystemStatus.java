@@ -1,4 +1,4 @@
-package github.axolotl.vaadinremotemanager.vo;
+package github.axolotl.vaadinremotemanager.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import java.util.Date;
  */
 @Data
 @AllArgsConstructor
-public class SystemStatusDO {
+public class SystemStatus {
     private Date date;
 
     private double cpuLoad;

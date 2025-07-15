@@ -15,11 +15,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
-import dczx.axolotl.util.DataUtil;
+import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
-import github.axolotl.vaadinremotemanager.vo.ProcessDO;
+import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
 import lombok.Getter;
 import lombok.Setter;
 import oshi.software.os.OSProcess;
@@ -33,9 +33,6 @@ import java.util.*;
  */
 @Route("/process")
 public class ProcessView extends VerticalLayout {
-    @Getter
-    @Setter
-    private static Long lastAccessTime = System.currentTimeMillis() * 2;
 
     public ProcessView() {
         VaadinRemoteManagerApplication.setLastAccessTime(System.currentTimeMillis());
@@ -49,12 +46,19 @@ public class ProcessView extends VerticalLayout {
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.focus();
 
-        List<ProcessDO> processList = ProcessVOService.getProcessList();
-        Grid<ProcessDO> processGrid = new Grid<>();
-        processGrid.addColumn(ProcessDO::getPid).setHeader("pid").setSortable(true).setWidth("2%");
+        List<ProcessEntity> processList = ProcessVOService.getProcessList();
+        Grid<ProcessEntity> processGrid = new Grid<>();
+        processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("2%");
 
+
+        processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("30%");
+        processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用").setSortable(true).setWidth("5%");
+        processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用").setSortable(true).setWidth("5%");
+        processGrid.addColumn(process -> process.getStatus().equals(OSProcess.State.RUNNING) ? "运行中" : "未知").setHeader("运行状态").setSortable(true).setWidth("4%");
+
+        // Add kill process button column with red background
         processGrid.addComponentColumn(process -> {
-            Button infoButton = new Button("查看", VaadinIcon.CHECK.create());
+            Button infoButton = new Button("查看", VaadinIcon.INFO_CIRCLE.create());
             infoButton.addClickListener(event -> {
                 Dialog dialog = new Dialog();
                 dialog.setHeaderTitle("进程信息");
@@ -67,7 +71,7 @@ public class ProcessView extends VerticalLayout {
                 data.add(List.of("命令", osProcess.getCommandLine()));
                 data.add(List.of("路径", osProcess.getPath()));
                 data.add(List.of("工作目录", osProcess.getCurrentWorkingDirectory()));
-                data.add(List.of("启动时间", DataUtil.formatDate(new Date(osProcess.getStartTime()))));
+                data.add(List.of("启动时间", DateUtil.formatDate(new Date(osProcess.getStartTime()))));
 
                 Grid<List<Object>> grid = ViewUtil.createDataGrid(data,List.of("10%", "90%"));
 
@@ -77,16 +81,6 @@ public class ProcessView extends VerticalLayout {
                 dialog.open();
             });
 
-            return infoButton;
-        }).setHeader("详细信息").setWidth("3%");
-
-        processGrid.addColumn(ProcessDO::getName).setHeader("名称").setSortable(true).setWidth("30%");
-        processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用").setSortable(true).setWidth("5%");
-        processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用").setSortable(true).setWidth("5%");
-        processGrid.addColumn(process -> process.getStatus().equals(OSProcess.State.RUNNING) ? "运行中" : "未知").setHeader("运行状态").setSortable(true).setWidth("4%");
-
-        // Add kill process button column with red background
-        processGrid.addComponentColumn(process -> {
             Button killButton = new Button("杀死进程", VaadinIcon.WARNING.create());
             killButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             killButton.addClickListener(event -> {
@@ -95,7 +89,7 @@ public class ProcessView extends VerticalLayout {
                     processList.remove(process);
                     Notification.show("进程已终止: " + process.getName(), 1200, Notification.Position.MIDDLE);
                     // Refresh the grid
-                    GridListDataView<ProcessDO> processDOGridListDataView = processGrid.setItems(ProcessVOService.getProcessList());
+                    GridListDataView<ProcessEntity> processDOGridListDataView = processGrid.setItems(ProcessVOService.getProcessList());
                     addFilter(searchField, processDOGridListDataView);
                     searchField.focus();
                 } else {
@@ -103,14 +97,16 @@ public class ProcessView extends VerticalLayout {
                             .addThemeVariants(NotificationVariant.LUMO_ERROR);
                 }
             });
-            return killButton;
-        }).setHeader("杀死进程").setWidth("7%");
+            infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            return new HorizontalLayout(infoButton,killButton);
+        }).setHeader("操作").setWidth("7%");
 
         processGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         processGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 
 
-        GridListDataView<ProcessDO> processDOGridListDataView = processGrid.setItems(processList);
+        GridListDataView<ProcessEntity> processDOGridListDataView = processGrid.setItems(processList);
 
 
         addFilter(searchField, processDOGridListDataView);
@@ -119,16 +115,16 @@ public class ProcessView extends VerticalLayout {
     }
 
 
-    private void addFilter(TextField searchField, GridListDataView<ProcessDO> processDOGridListDataView) {
+    private void addFilter(TextField searchField, GridListDataView<ProcessEntity> processDOGridListDataView) {
         searchField.addValueChangeListener(e -> processDOGridListDataView.refreshAll());
-        processDOGridListDataView.addFilter(processDO -> {
+        processDOGridListDataView.addFilter(processEntity -> {
             String searchTerm = searchField.getValue().trim();
 
             if (searchTerm.isEmpty())
                 return true;
 
-            boolean matchesName = processDO.getName().toLowerCase().contains(searchTerm.toLowerCase());
-            boolean matchesPid = String.valueOf(processDO.getPid()).contains(searchTerm.toLowerCase());
+            boolean matchesName = processEntity.getName().toLowerCase().contains(searchTerm.toLowerCase());
+            boolean matchesPid = String.valueOf(processEntity.getPid()).contains(searchTerm.toLowerCase());
             return matchesName || matchesPid;
         });
     }

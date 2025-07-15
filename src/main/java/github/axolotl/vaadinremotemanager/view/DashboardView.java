@@ -1,14 +1,7 @@
 package github.axolotl.vaadinremotemanager.view;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.HasText;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -19,12 +12,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.SystemStatusService;
-import github.axolotl.vaadinremotemanager.util.ViewUtil;
-import github.axolotl.vaadinremotemanager.vo.SystemStatusDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.List;
 
 @Route("/")
 public class DashboardView extends VerticalLayout {
@@ -34,12 +23,12 @@ public class DashboardView extends VerticalLayout {
         setSizeFull();
 
         DashboardViewTest(
-                SystemStatusService.getSystemStatusDO(),
+                SystemStatusService.getSystemStatus(),
                 this
         );
     }
 
-    public void DashboardViewTest(SystemStatusDO systemStatus, VerticalLayout content) {
+    public void DashboardViewTest(github.axolotl.vaadinremotemanager.entity.SystemStatus systemStatus, VerticalLayout content) {
         // 1. 创建顶部标题和刷新按钮
         HorizontalLayout header = new HorizontalLayout(
                 new H2("系统概览"),

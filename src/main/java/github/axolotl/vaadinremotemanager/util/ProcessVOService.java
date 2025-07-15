@@ -1,6 +1,6 @@
 package github.axolotl.vaadinremotemanager.util;
 
-import github.axolotl.vaadinremotemanager.vo.ProcessDO;
+import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -24,9 +24,9 @@ import static github.axolotl.vaadinremotemanager.util.ServiceUtil.isRecentlyAcce
 @Component
 public class ProcessVOService {
     @Getter
-    private static List<ProcessDO> processList;//存放最新的VO对象
+    private static List<ProcessEntity> processList;//存放最新的VO对象
 
-    private static List<ProcessDO> getAllProcesses() {
+    private static List<ProcessEntity> getAllProcesses() {
         // 创建系统信息对象
         SystemInfo systemInfo = new SystemInfo();
         // 获取操作系统接口
@@ -52,7 +52,7 @@ public class ProcessVOService {
                             && !name.equals("WeChatAppEx")
                             ;
                 }) // 过滤浏览器进程
-                .map(process -> new ProcessDO(
+                .map(process -> new ProcessEntity(
                         process.getName(),           // 进程名称
                         process.getProcessID(),      // 进程ID
                         process.getProcessCpuLoadBetweenTicks(process) / totalCpuUsage, // CPU使用率
@@ -60,7 +60,7 @@ public class ProcessVOService {
                         process.getState(),           // 进程状态
                         process
                 ))
-                .sorted(Comparator.comparingDouble(ProcessDO::getMemoryUsage).reversed())
+                .sorted(Comparator.comparingDouble(ProcessEntity::getMemoryUsage).reversed())
                 .collect(Collectors.toList());
     }
     // 每隔fixedRate执行一次

@@ -1,4 +1,4 @@
-package github.axolotl.vaadinremotemanager.vo;
+package github.axolotl.vaadinremotemanager.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import oshi.software.os.OSProcess;
  */
 @Data
 @AllArgsConstructor
-public class ProcessDO {
+public class ProcessEntity {
     private String name; // 进程名称
     private int pid; // 进程ID
     private double cpuUsage; // CPU使用率

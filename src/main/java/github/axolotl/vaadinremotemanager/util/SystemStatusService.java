@@ -1,7 +1,7 @@
 package github.axolotl.vaadinremotemanager.util;
 
 
-import github.axolotl.vaadinremotemanager.vo.SystemStatusDO;
+import github.axolotl.vaadinremotemanager.entity.SystemStatus;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -30,7 +30,7 @@ import static github.axolotl.vaadinremotemanager.util.ServiceUtil.isRecentlyAcce
 @Component
 public class SystemStatusService {
     @Getter
-    private static SystemStatusDO systemStatusDO;//存放最新的VO对象
+    private static SystemStatus systemStatus;//存放最新的VO对象
 
 
 
@@ -40,7 +40,7 @@ public class SystemStatusService {
      *
      * @throws InterruptedException 如果在计算 CPU 负载时线程休眠被中断
      */
-    private SystemStatusDO requestSystemStatus(int cpuCheckTime, int networkCheckTime) throws InterruptedException {
+    private SystemStatus requestSystemStatus(int cpuCheckTime, int networkCheckTime) throws InterruptedException {
         SystemInfo systemInfo = new SystemInfo();
         HardwareAbstractionLayer hardware = systemInfo.getHardware();
         OperatingSystem os = systemInfo.getOperatingSystem();
@@ -97,7 +97,7 @@ public class SystemStatusService {
 //        System.out.printf("网络上行速度: %.2f KB/s%n", networkUplink);
 //        System.out.printf("网络下行速度: %.2f KB/s%n", networkDownlink);
 
-        return new SystemStatusDO(new Date(),
+        return new SystemStatus(new Date(),
                 cpuLoad, cpuName,
                 memoryLoad, usedMemory, totalMemory,
                 diskUsagePercent, usedDisk, totalDisk,
@@ -122,7 +122,7 @@ public class SystemStatusService {
     public void FastCheck() {
         //最近有访问就快速更新
         if (isRecentlyAccessed())
-            systemStatusDO = requestSystemStatus(1000, 1000);
+            systemStatus = requestSystemStatus(1000, 1000);
     }
 
     // 每隔fixedRate执行一次 延迟initialDelay执行
@@ -130,13 +130,13 @@ public class SystemStatusService {
     @SneakyThrows
     public void LongTimeCheck() {
         if (!isRecentlyAccessed())
-            systemStatusDO = requestSystemStatus(3000, 3000);
+            systemStatus = requestSystemStatus(3000, 3000);
     }
 
     @PostConstruct
     public void init() {
         // 在对象创建后执行的初始化逻辑
-        systemStatusDO = new SystemStatusDO(
+        systemStatus = new SystemStatus(
                 new Date(),
                 0, "Unknown",
                 0.0, 0.0, 0.0,
