@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -55,6 +56,8 @@ public class TemplateView extends VerticalLayout {
         templateGrid.addColumn(TerminalTemplate::getCommands).setHeader("命令").setSortable(true).setWidth("30%");
         templateGrid.addColumn(TerminalTemplate::getWorkingDirectory).setHeader("工作目录").setSortable(true).setWidth("25%");
 
+        GridListDataView<TerminalTemplate> terminalTemplateGridListDataView = templateGrid.setItems(templateList);
+
         // Add kill process button column with red background
         templateGrid.addComponentColumn(template -> {
 
@@ -99,8 +102,9 @@ public class TemplateView extends VerticalLayout {
                     Notification notification = new Notification("模板已更新", 3000);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                     notification.open();
-
                     dialog.close();
+
+                    UI.getCurrent().getPage().reload();
                 });
 
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -110,10 +114,11 @@ public class TemplateView extends VerticalLayout {
                         nameField,
                         descriptionField,
                         workingDirectoryField,
+                        startCommandField,
                         commandsField,
                         saveButton
                 );
-                formLayout.setAlignSelf(FlexComponent.Alignment.END, saveButton); // 右对齐 [[8]]
+                formLayout.setAlignSelf(Alignment.END, saveButton); // 右对齐 [[8]]
                 formLayout.setSpacing(false);
 
                 // 设置对话框内容
@@ -138,9 +143,6 @@ public class TemplateView extends VerticalLayout {
 
         templateGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         templateGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-
-
-        GridListDataView<TerminalTemplate> terminalTemplateGridListDataView = templateGrid.setItems(templateList);
 
 
         addFilter(searchField, terminalTemplateGridListDataView);

@@ -23,6 +23,10 @@ public class TerminalInstance {
     private TerminalTemplate template;
     private ProcessTerminal terminal;
 
+    public boolean isRunning() {
+        return terminal.isRunning();
+    }
+
     private String name; // 终端实例名称
 
 
@@ -63,5 +67,8 @@ public class TerminalInstance {
         return terminal.getHistory();
     }
 
-
+    @Override
+    public String toString() {
+        return "[%s]%s".formatted(name,template.getDescription());
+    }
 }

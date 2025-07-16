@@ -21,31 +21,23 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalService;
 import lombok.SneakyThrows;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static github.axolotl.vaadinremotemanager.util.ServiceUtil.isRecentlyAccessed;
 
 /**
  * @author AxolotlXM
  * @version 1.0
  * @since 2025/7/5 11:07
  */
-@UIScope
 @Component
-@Route("/terminal")
-public class TerminalView extends VerticalLayout {
+@Route("/terminal-instance")
+public class TerminalInstanceView extends VerticalLayout {
 
     private final TerminalTemplate template;
     private final ProcessTerminal terminal;
@@ -60,16 +52,15 @@ public class TerminalView extends VerticalLayout {
     private static int refreshDelay = 700;
     private TextField commandInput;
     private ComboBox<String> historyComboBox;
-    private ComboBox<TerminalInstance> terminalSelector;
+    private ComboBox<TerminalInstance> terminalSelector = new ComboBox<>();
 
 
-    public TerminalView() {
+    public TerminalInstanceView() {
         TerminalInstance instance = TerminalService.getTerminalList().get(0);
         this.terminal = instance.getTerminal();
         this.template = instance.getTemplate();
         this.name = instance.getName();
 
-        setAvailableTerminals(TerminalService.getTerminalList());
 
         setSizeFull();
         createView();
@@ -80,20 +71,20 @@ public class TerminalView extends VerticalLayout {
 
     /**
      * 当组件被附加到UI时调用 用于推送更新
-     * @param attachEvent
-     *            the attach event
+     *
+     * @param attachEvent the attach event
      */
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         var task = scheduler.scheduleAtFixedRate(() -> attachEvent.getUI().accessSynchronously(() -> {
-            if (refreshDelay >= 0) {
-                if (System.currentTimeMillis() - lastAccessTime > refreshDelay) {
-                    loadInitialHistory();
-                    lastAccessTime = System.currentTimeMillis(); // 更新最后访问时间
-                }
-            }
-        }), 0, 1, TimeUnit.SECONDS
+                    if (refreshDelay >= 0) {
+                        if (System.currentTimeMillis() - lastAccessTime > refreshDelay) {
+                            loadInitialHistory();
+                            lastAccessTime = System.currentTimeMillis(); // 更新最后访问时间
+                        }
+                    }
+                }), 0, 1, TimeUnit.SECONDS
         );
         addDetachListener(detachEvent -> {
             detachEvent.unregisterListener();
@@ -103,6 +94,8 @@ public class TerminalView extends VerticalLayout {
 
 
     private void createView() {
+
+
         // 顶部栏：终端名称 + 终端选择器
         HorizontalLayout topBar = new HorizontalLayout();
         topBar.setWidthFull();
@@ -121,8 +114,10 @@ public class TerminalView extends VerticalLayout {
         });
 
         terminalSelector = new ComboBox<>();
+        terminalSelector.setLabel("切换终端");
         terminalSelector.setPlaceholder("Select terminal");
         terminalSelector.setWidth("200px");
+        terminalSelector.setItems(TerminalService.getTerminalList());
 
         topBar.add(terminalName);
         topBar.addAndExpand(new Div()); // 占位空间
@@ -278,8 +273,4 @@ public class TerminalView extends VerticalLayout {
         historyDisplay.getElement().executeJs("this.scrollTop = this.scrollHeight;");
     }
 
-    // 设置可选择的终端列表
-    public void setAvailableTerminals(List<TerminalInstance> terminals) {
-        terminalSelector.setItems(terminals);
-    }
 }

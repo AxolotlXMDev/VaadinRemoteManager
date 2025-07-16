@@ -6,6 +6,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -20,7 +21,9 @@ import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import oshi.software.os.OSProcess;
 
@@ -54,7 +57,20 @@ public class ProcessView extends VerticalLayout {
         processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("30%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用").setSortable(true).setWidth("5%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用").setSortable(true).setWidth("5%");
-        processGrid.addColumn(process -> process.getStatus().equals(OSProcess.State.RUNNING) ? "运行中" : "未知").setHeader("运行状态").setSortable(true).setWidth("4%");
+
+
+        processGrid.addComponentColumn(process -> {
+
+            Span span;
+            if (process.getStatus().equals(OSProcess.State.RUNNING)) {
+                span = new Span("运行中");
+                span.getElement().getThemeList().add("badge success");
+            } else {
+                span = new Span("停止");
+                span.getElement().getThemeList().add("badge error");
+            }
+            return span;
+        }).setHeader("运行状态").setSortable(true).setWidth("4%");
 
         // Add kill process button column with red background
         processGrid.addComponentColumn(process -> {
@@ -73,7 +89,7 @@ public class ProcessView extends VerticalLayout {
                 data.add(List.of("工作目录", osProcess.getCurrentWorkingDirectory()));
                 data.add(List.of("启动时间", DateUtil.formatDate(new Date(osProcess.getStartTime()))));
 
-                Grid<List<Object>> grid = ViewUtil.createDataGrid(data,List.of("10%", "90%"));
+                Grid<List<Object>> grid = ViewUtil.createDataGrid(data, List.of("10%", "90%"));
 
                 dialog.add(grid);
                 dialog.setWidth("70%"); // 视口宽度的50%
@@ -99,7 +115,7 @@ public class ProcessView extends VerticalLayout {
             });
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(infoButton,killButton);
+            return new HorizontalLayout(infoButton, killButton);
         }).setHeader("操作").setWidth("7%");
 
         processGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);

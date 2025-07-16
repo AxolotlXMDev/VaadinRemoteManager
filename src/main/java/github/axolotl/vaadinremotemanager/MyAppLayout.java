@@ -8,7 +8,6 @@ import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.view.*;
 
@@ -20,7 +19,6 @@ import github.axolotl.vaadinremotemanager.view.*;
  */
 //用于定义应用程序的布局
 @Layout
-@CssImport(value = "./styles/main-styles.css")
 public class MyAppLayout extends AppLayout {
 
     public MyAppLayout() {
@@ -47,8 +45,8 @@ public class MyAppLayout extends AppLayout {
         nav.addItem(
                 new SideNavItem("仪表盘", DashboardView.class, VaadinIcon.DASHBOARD.create()),
                 new SideNavItem("所有进程管理", ProcessView.class, VaadinIcon.OFFICE.create()),
-                new SideNavItem("终端管理", TerminalView.class, VaadinIcon.TERMINAL.create()),
-                new SideNavItem("模板管理", TemplateView.class, VaadinIcon.PANEL.create()),
+                new SideNavItem("终端管理", TerminalManagerView.class, VaadinIcon.TERMINAL.create()),
+                new SideNavItem("模板管理", TemplateView.class, VaadinIcon.PAPERCLIP.create()),
                 new SideNavItem("设置", SettingView.class, VaadinIcon.HEADSET.create()),
                 new SideNavItem("关于我们", AboutUsView.class, VaadinIcon.ABACUS.create())
         );
