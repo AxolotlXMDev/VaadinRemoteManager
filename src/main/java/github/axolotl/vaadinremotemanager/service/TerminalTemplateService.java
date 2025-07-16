@@ -17,8 +17,13 @@ public class TerminalTemplateService {
 
     static {
         templateList.add(new TerminalTemplate(
-                "测试", "测试用", System.getProperty("user.dir"),
-                "cmd.exe","chcp 65001", "java -version", "java"
+                "默认模板", "默认模板，可用于创建一个空白的终端", System.getProperty("user.dir"),
+                isWin()?"cmd.exe":"bash","echo Hello World!"
         ));
+    }
+
+    private static boolean isWin(){
+        String os = System.getProperty("os.name").toLowerCase();
+        return os.contains("win");
     }
 }

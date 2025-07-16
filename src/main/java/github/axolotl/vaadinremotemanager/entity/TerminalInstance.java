@@ -4,7 +4,9 @@ import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.terminal.TerminalStreamRefresh;
 import dczx.axolotl.util.DateUtil;
+import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import lombok.Data;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 
@@ -22,6 +24,10 @@ import java.util.List;
 public class TerminalInstance {
     private TerminalTemplate template;
     private ProcessTerminal terminal;
+    private long startTime;
+
+    @Getter
+    private String id;//时间戳+终端列表大小 基本唯一了
 
     public boolean isRunning() {
         return terminal.isRunning();
@@ -32,7 +38,7 @@ public class TerminalInstance {
 
     public TerminalInstance(TerminalTemplate template) {
         this.template = template;
-        name = template.getName() +" - "+ DateUtil.formatDate(new Date(), "hh:mm:ss");
+        name = template.getName() + " - " + DateUtil.formatDate(new Date(), "hh:mm:ss");
     }
 
     public TerminalInstance(String name, TerminalTemplate template) {
@@ -41,7 +47,9 @@ public class TerminalInstance {
     }
 
     public void start() {
-         terminal = new ProcessTerminal(template.getStartCommand(),template.getWorkingDirectory());
+        startTime = System.currentTimeMillis();
+        id = System.currentTimeMillis() + "-" + TerminalInstanceService.getInstanceMap().size();
+        terminal = new ProcessTerminal(template.getStartCommand(), template.getWorkingDirectory());
         template.getCommands().forEach(command -> {
             try {
                 terminal.execute(command);
@@ -69,6 +77,6 @@ public class TerminalInstance {
 
     @Override
     public String toString() {
-        return "[%s]%s".formatted(name,template.getDescription());
+        return "[%s]%s".formatted(name, template.getDescription());
     }
 }

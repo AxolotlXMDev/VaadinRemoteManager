@@ -20,7 +20,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
+import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
+import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
@@ -133,7 +135,7 @@ public class TemplateView extends VerticalLayout {
             //从模板启动和模板修改启动
             Button luanchButton = new Button("启动", VaadinIcon.PLAY.create());
             luanchButton.addClickListener(event -> {
-
+                TerminalInstanceService.startTerminalInstance(new TerminalInstance(template));
             });
 
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);

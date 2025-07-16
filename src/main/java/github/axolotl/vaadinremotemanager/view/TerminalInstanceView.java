@@ -1,9 +1,12 @@
 package github.axolotl.vaadinremotemanager.view;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -13,14 +16,14 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.spring.annotation.UIScope;
 import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.terminal.TerminalStringRefresh;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
-import github.axolotl.vaadinremotemanager.service.TerminalService;
+import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import lombok.SneakyThrows;
+import org.apache.commons.io.function.IOBaseStream;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -35,13 +38,17 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2025/7/5 11:07
  */
-@Component
-@Route("/terminal-instance")
-public class TerminalInstanceView extends VerticalLayout {
 
-    private final TerminalTemplate template;
-    private final ProcessTerminal terminal;
-    private final String name;
+@Route("/terminal-instance/:terminalId?")
+public class TerminalInstanceView extends VerticalLayout implements BeforeEnterObserver {
+
+    private static final String QUERY_PARAM_ID = "terminalId";
+
+    private String terminalId;
+
+    private TerminalTemplate template;
+    private ProcessTerminal terminal;
+    private String name;
 
     private long lastAccessTime = System.currentTimeMillis();
 
@@ -56,11 +63,15 @@ public class TerminalInstanceView extends VerticalLayout {
 
 
     public TerminalInstanceView() {
-        TerminalInstance instance = TerminalService.getTerminalList().get(0);
+
+//        initView();
+    }
+
+    private void initView() {
+        TerminalInstance instance = TerminalInstanceService.getTerminalInstance(terminalId);
         this.terminal = instance.getTerminal();
         this.template = instance.getTemplate();
         this.name = instance.getName();
-
 
         setSizeFull();
         createView();
@@ -104,6 +115,10 @@ public class TerminalInstanceView extends VerticalLayout {
         Span terminalName = new Span(name);
         terminalName.getStyle().set("font-weight", "bold");
 
+        Button returnButton = new Button("返回", VaadinIcon.REPLY.create(), e -> {
+            returnToManager();
+        });
+        returnButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
 
         IntegerField refreshDelayField = new IntegerField();
         refreshDelayField.setLabel("刷新延迟");
@@ -117,10 +132,11 @@ public class TerminalInstanceView extends VerticalLayout {
         terminalSelector.setLabel("切换终端");
         terminalSelector.setPlaceholder("Select terminal");
         terminalSelector.setWidth("200px");
-        terminalSelector.setItems(TerminalService.getTerminalList());
+        terminalSelector.setItems(TerminalInstanceService.getInstanceMap().values());
 
         topBar.add(terminalName);
         topBar.addAndExpand(new Div()); // 占位空间
+        topBar.add(returnButton);
         topBar.add(refreshDelayField);
         topBar.add(terminalSelector);
         add(topBar);
@@ -163,6 +179,10 @@ public class TerminalInstanceView extends VerticalLayout {
 
         // 设置回车键发送
         commandInput.addKeyPressListener(Key.ENTER, e -> sendCommand());
+    }
+
+    private static void returnToManager() {
+        UI.getCurrent().navigate(TerminalManagerView.class);
     }
 
 
@@ -271,6 +291,14 @@ public class TerminalInstanceView extends VerticalLayout {
 
     private void scrollToBottom() {
         historyDisplay.getElement().executeJs("this.scrollTop = this.scrollHeight;");
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        event.getRouteParameters().get(QUERY_PARAM_ID).ifPresentOrElse(id -> {
+            terminalId = id;
+            initView();
+        }, TerminalInstanceView::returnToManager);
     }
 
 }

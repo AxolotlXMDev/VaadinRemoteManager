@@ -1,9 +1,11 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Span;
@@ -16,12 +18,18 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.router.RouterLink;
+import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
-import github.axolotl.vaadinremotemanager.service.TerminalService;
+import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author AxolotlXM
@@ -45,11 +53,14 @@ public class TerminalManagerView extends VerticalLayout {
         searchField.focus();
 
 
-        List<TerminalInstance> instanceList = TerminalService.getTerminalList();
         Grid<TerminalInstance> instanceGrid = new Grid<>();
-        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("15%");
+        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("20%");
 
-        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("15%");
+        instanceGrid.addColumn(instance -> DateUtil.formatDate(new Date(instance.getStartTime())))
+                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("20%");
+        instanceGrid.sort(GridSortOrder.desc(instanceGrid.getColumnByKey("time")).build());
+
+        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("20%");
 
         instanceGrid.addComponentColumn(instance -> {
             Span span;
@@ -61,12 +72,14 @@ public class TerminalManagerView extends VerticalLayout {
                 span.getElement().getThemeList().add("badge error");
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("1%");
+        }).setHeader("运行状态").setSortable(true).setWidth("12%");
 
         instanceGrid.addComponentColumn(instance -> {
             Button jumpButton = new Button("跳转", VaadinIcon.PLAY_CIRCLE.create());
             jumpButton.addClickListener(event -> {
-
+                UI.getCurrent().navigate(TerminalInstanceView.class, new RouteParameters("terminalId", instance.getId()));
+//                UI.getCurrent().navigate(TerminalInstanceView.class, new QueryParameters(
+//                       Map.of( "terminalId", List.of(instance.getId()))));
             });
             Button settingButton = new Button("编辑", VaadinIcon.COG_O.create());
             settingButton.addClickListener(event -> {
@@ -127,17 +140,18 @@ public class TerminalManagerView extends VerticalLayout {
                 reFreshGridData(instance, instanceGrid);
             });
 
+            jumpButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             settingButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             copyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(settingButton, copyButton, killButton);
-        }).setHeader("操作").setWidth("9%");
+            return new HorizontalLayout(jumpButton, settingButton, copyButton, killButton);
+        }).setHeader("操作").setWidth("150%");
 
         instanceGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         instanceGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 
 
-        GridListDataView<TerminalInstance> terminalInstanceGridListDataView = instanceGrid.setItems(instanceList);
+        GridListDataView<TerminalInstance> terminalInstanceGridListDataView = instanceGrid.setItems(TerminalInstanceService.getInstanceMap().values());
 
 
         addFilter(searchField, terminalInstanceGridListDataView);
