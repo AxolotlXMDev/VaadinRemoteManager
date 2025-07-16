@@ -11,6 +11,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -61,23 +62,70 @@ public class TemplateView extends VerticalLayout {
             infoButton.addClickListener(event -> {
                 Dialog dialog = new Dialog();
                 dialog.setHeaderTitle("模板信息");
-                Button closeButton = new Button(new Icon("lumo", "cross"), (e) -> dialog.close());
 
-                List<List<Object>> data = new ArrayList<>();
-                data.add(List.of("名称", template.getName()));
-                data.add(List.of("描述", template.getDescription()));
-                data.add(List.of("工作目录", template.getWorkingDirectory()));
-                data.add(List.of("命令", template.getCommands()));
+                // 创建关闭按钮
+                Button closeButton = new Button(new Icon("lumo", "cross"), e -> dialog.close());
 
-                Grid<List<Object>> grid = ViewUtil.createDataGrid(data,List.of("10%", "90%"));
+                // 创建用于编辑的对象字段
+                TextField nameField = new TextField("名称");
+                nameField.setValue(template.getName());
+                nameField.setWidthFull();
 
-                dialog.add(grid);
-                dialog.setWidth("70%"); // 视口宽度的50%
+                TextField descriptionField = new TextField("描述");
+                descriptionField.setValue(template.getDescription());
+                descriptionField.setWidthFull();
+
+                TextField startCommandField = new TextField("启动命令");
+                startCommandField.setValue(template.getStartCommand());
+                startCommandField.setWidthFull();
+
+                TextField workingDirectoryField = new TextField("工作目录");
+                workingDirectoryField.setValue(template.getWorkingDirectory());
+                workingDirectoryField.setWidthFull();
+
+                TextField commandsField = new TextField("命令");
+                commandsField.setValue(String.join("<n>", template.getCommands()));
+                commandsField.setWidthFull();
+
+                // 保存按钮
+                Button saveButton = new Button("保存", e -> {
+                    // 更新对象属性
+                    template.setName(nameField.getValue());
+                    template.setDescription(descriptionField.getValue());
+                    template.setStartCommand(startCommandField.getValue());
+                    template.setWorkingDirectory(workingDirectoryField.getValue());
+                    template.setCommands(List.of(commandsField.getValue().split("<n>")));
+
+                    Notification notification = new Notification("模板已更新", 3000);
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                    notification.open();
+
+                    dialog.close();
+                });
+
+                saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+                // 使用 VerticalLayout 布局表单内容
+                VerticalLayout formLayout = new VerticalLayout(
+                        nameField,
+                        descriptionField,
+                        workingDirectoryField,
+                        commandsField,
+                        saveButton
+                );
+                formLayout.setAlignSelf(FlexComponent.Alignment.END, saveButton); // 右对齐 [[8]]
+                formLayout.setSpacing(false);
+
+                // 设置对话框内容
+                dialog.add(formLayout);
+                dialog.setWidth("70%"); // 设置宽度为视口的70%
                 dialog.getHeader().add(closeButton);
+
+                // 打开对话框
                 dialog.open();
             });
 
-
+            //从模板启动和模板修改启动
             Button luanchButton = new Button("启动", VaadinIcon.PLAY.create());
             luanchButton.addClickListener(event -> {
 

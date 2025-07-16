@@ -1,5 +1,7 @@
 package github.axolotl.vaadinremotemanager;
 
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.component.page.Push;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.SpringApplication;
@@ -8,7 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class VaadinRemoteManagerApplication {
+@Push
+public class VaadinRemoteManagerApplication implements AppShellConfigurator {
 
     @Getter
     @Setter

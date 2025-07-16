@@ -14,10 +14,11 @@ import java.util.List;
 public class TerminalTemplateService {
     @Getter
     private static final List<TerminalTemplate> templateList = new ArrayList<>();
+
     static {
         templateList.add(new TerminalTemplate(
-                "测试","测试用",System.getProperty("user.dir"),
-                "cmd /c","java -version"
+                "测试", "测试用", System.getProperty("user.dir"),
+                "cmd.exe","chcp 65001", "java -version", "java"
         ));
     }
 }

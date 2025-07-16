@@ -19,13 +19,15 @@ public class TerminalTemplate {
     private String description;
 
     private String workingDirectory; // 工作目录
+    private String startCommand; // 启动命令 如cmd.exe
     private List<String> commands; // 执行的命令
 
 
-    public TerminalTemplate(String name, String description, String workingDirectory, String... commands) {
+    public TerminalTemplate(String name, String description, String workingDirectory,String startCommand, String... commands) {
         this.name = name;
         this.description = description;
         this.workingDirectory = workingDirectory;
+        this.startCommand = startCommand;
         this.commands = List.of(commands);
     }
 }
