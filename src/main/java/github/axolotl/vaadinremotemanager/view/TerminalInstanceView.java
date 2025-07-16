@@ -2,7 +2,6 @@ package github.axolotl.vaadinremotemanager.view;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -23,8 +22,6 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import lombok.SneakyThrows;
-import org.apache.commons.io.function.IOBaseStream;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -46,6 +43,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
 
     private String terminalId;
 
+    private TerminalInstance instance;
     private TerminalTemplate template;
     private ProcessTerminal terminal;
     private String name;
@@ -68,7 +66,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
     }
 
     private void initView() {
-        TerminalInstance instance = TerminalInstanceService.getTerminalInstance(terminalId);
+        this.instance = TerminalInstanceService.getTerminalInstance(terminalId);
         this.terminal = instance.getTerminal();
         this.template = instance.getTemplate();
         this.name = instance.getName();
@@ -131,8 +129,14 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
         terminalSelector = new ComboBox<>();
         terminalSelector.setLabel("切换终端");
         terminalSelector.setPlaceholder("Select terminal");
-        terminalSelector.setWidth("200px");
-        terminalSelector.setItems(TerminalInstanceService.getInstanceMap().values());
+        terminalSelector.setWidth("60%");
+            terminalSelector.setItems(TerminalInstanceService.getInstanceMap().values());
+            terminalSelector.setValue(instance);
+        terminalSelector.addValueChangeListener(event -> {
+            String id = event.getValue().getId();
+            UI.getCurrent().navigate(AboutUsView.class);//必须先切换走 否则会被认为是同一个页面不重新路由
+            TerminalInstanceService.jumpToTerminalById(id);
+        });
 
         topBar.add(terminalName);
         topBar.addAndExpand(new Div()); // 占位空间
@@ -296,6 +300,11 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         event.getRouteParameters().get(QUERY_PARAM_ID).ifPresentOrElse(id -> {
+            if (!TerminalInstanceService.getInstanceMap().containsKey(id)) {//没有这个终端
+//                Notification.show("终端实例不存在或已被删除", 3000, Notification.Position.MIDDLE);
+                returnToManager();
+                return;
+            }
             terminalId = id;
             initView();
         }, TerminalInstanceView::returnToManager);

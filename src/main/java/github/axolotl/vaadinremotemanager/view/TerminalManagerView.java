@@ -1,6 +1,5 @@
 package github.axolotl.vaadinremotemanager.view;
 
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -18,18 +17,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteParameters;
-import com.vaadin.flow.router.RouterLink;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author AxolotlXM
@@ -77,9 +71,7 @@ public class TerminalManagerView extends VerticalLayout {
         instanceGrid.addComponentColumn(instance -> {
             Button jumpButton = new Button("跳转", VaadinIcon.PLAY_CIRCLE.create());
             jumpButton.addClickListener(event -> {
-                UI.getCurrent().navigate(TerminalInstanceView.class, new RouteParameters("terminalId", instance.getId()));
-//                UI.getCurrent().navigate(TerminalInstanceView.class, new QueryParameters(
-//                       Map.of( "terminalId", List.of(instance.getId()))));
+                TerminalInstanceService.jumpToTerminalById(instance.getId());
             });
             Button settingButton = new Button("编辑", VaadinIcon.COG_O.create());
             settingButton.addClickListener(event -> {
@@ -158,6 +150,8 @@ public class TerminalManagerView extends VerticalLayout {
         add(searchField);
         add(instanceGrid);
     }
+
+
 
     private static void reFreshGridData(TerminalInstance instance, Grid<TerminalInstance> instanceGrid) {
         GridListDataView<TerminalInstance> dataView = instanceGrid.getListDataView();

@@ -1,6 +1,9 @@
 package github.axolotl.vaadinremotemanager.service;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.router.RouteParameters;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
+import github.axolotl.vaadinremotemanager.view.TerminalInstanceView;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -26,5 +29,8 @@ public class TerminalInstanceService {
 
     public static TerminalInstance getTerminalInstance(String id) {
         return instanceMap.get(id);
+    }
+    public static void jumpToTerminalById(String terminalId) {
+        UI.getCurrent().navigate(TerminalInstanceView.class, new RouteParameters("terminalId",terminalId));
     }
 }
