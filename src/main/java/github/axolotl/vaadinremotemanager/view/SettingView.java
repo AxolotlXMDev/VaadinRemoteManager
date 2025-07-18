@@ -1,7 +1,21 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.listbox.MultiSelectListBox;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
+import github.axolotl.vaadinremotemanager.entity.SettingEntity;
+import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
+import github.axolotl.vaadinremotemanager.service.SettingService;
+import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
+
 
 /**
  * @author AxolotlXM
@@ -11,7 +25,71 @@ import com.vaadin.flow.router.Route;
 @Route("/setting")
 public class SettingView extends VerticalLayout {
     public SettingView() {
+        SettingEntity setting = SettingService.getSetting();
+
         setSizeFull();
+
+        TextField defaultWorkingDirectoryField = new TextField("默认工作路径");
+        defaultWorkingDirectoryField.setValue(setting.getDefaultWorkingDirectory());
+        defaultWorkingDirectoryField.setWidthFull();
+
+        TextField defaultStartCommandField = new TextField("默认启动命令");
+        defaultStartCommandField.setValue(setting.getDefaultStartCommand());
+        defaultStartCommandField.setWidthFull();
+
+        TextField defaultTerminalNameField = new TextField("默认终端名称");
+        defaultTerminalNameField.setValue(setting.getDefaultTerminalName());
+        defaultTerminalNameField.setWidthFull();
+
+        Span selfStartListSpan = new Span(("自启动终端列表"));
+        MultiSelectListBox<TerminalTemplate> selfStartList = new MultiSelectListBox<>();
+        selfStartList.setItems(TerminalTemplateService.getTemplateList());
+        selfStartList.setWidthFull();
+
+        selfStartList.select(
+                TerminalTemplateService.getTemplateList()
+                        .parallelStream()
+                        .filter(template -> setting.getSelfStartList().contains(template.getId()))
+                        .toList()
+        );
+        selfStartList.setRenderer(new ComponentRenderer<>(template -> {
+            VerticalLayout verticalLayout = new VerticalLayout();
+
+            Span span = new Span("%s(%s)[%s]".formatted(template.getName(), template.getDescription(), template.getWorkingDirectory()));
+            Span subSpan = new Span(String.join(",", template.getCommands()));
+            verticalLayout.add(span);
+            verticalLayout.add(subSpan);
+
+            verticalLayout.setSpacing(false);
+            verticalLayout.setPadding(false);
+
+//            verticalLayout.addClassName("small");
+            return verticalLayout;
+        }));
+
+        Button saveButton = new Button("保存", VaadinIcon.FILE_CODE.create());
+        saveButton.addClickListener(event -> {
+            setting.setDefaultWorkingDirectory(defaultWorkingDirectoryField.getValue());
+            setting.setDefaultStartCommand(defaultStartCommandField.getValue());
+            setting.setDefaultTerminalName(defaultTerminalNameField.getValue());
+            setting.setSelfStartList(selfStartList.getSelectedItems().stream().map(TerminalTemplate::getId).toList());
+
+            SettingService.setSetting(setting);
+            SettingService.save();
+            Notification.show("设置已保存", 2000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        });
+
+
+        add(defaultWorkingDirectoryField);
+        add(defaultStartCommandField);
+        add(defaultTerminalNameField);
+        add(new Hr());
+        add(selfStartListSpan);
+        add(selfStartList);
+        add(new Hr());
+        add(saveButton);
+
 
     }
 }

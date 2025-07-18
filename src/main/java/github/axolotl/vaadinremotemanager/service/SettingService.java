@@ -4,6 +4,7 @@ import dczx.axolotl.util.FileUtil;
 import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.util.data.SettingDataUtil;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author AxolotlXM
@@ -12,6 +13,7 @@ import lombok.Getter;
  */
 public class SettingService {
     @Getter
+    @Setter
     private static SettingEntity setting;
     private static final SettingDataUtil settingUtil = new SettingDataUtil(FileUtil.keepFileExists("./data/setting.json"));
 
@@ -24,16 +26,4 @@ public class SettingService {
     }
 
 
-    private static boolean isWin() {
-        String os = System.getProperty("os.name").toLowerCase();
-        return os.contains("win");
-    }
-
-    public static String getDefaultStartCommand() {
-        if (isWin()) {
-            return "cmd.exe";
-        } else {
-            return "bash";
-        }
-    }
 }

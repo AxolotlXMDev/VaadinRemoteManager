@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SettingEntity {
     private String defaultWorkingDirectory = System.getProperty("user.dir");
-    private String defaultStartCommand = TerminalTemplateService.getDefaultStartCommand();
+    private String defaultStartCommand =  getSystemDefaultStartCommand();
 
     /**
      * 终端名称
@@ -28,4 +28,16 @@ public class SettingEntity {
 
     private List<String> selfStartList = List.of();//自启动模板Id列表
 
+    private static boolean isWin() {
+        String os = System.getProperty("os.name").toLowerCase();
+        return os.contains("win");
+    }
+
+    public static String getSystemDefaultStartCommand() {
+        if (isWin()) {
+            return "cmd.exe";
+        } else {
+            return "bash";
+        }
+    }
 }
