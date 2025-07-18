@@ -27,7 +27,7 @@ public class SettingEntity {
     private List<String> selfStartList = List.of();//自启动模板Id列表
     //TODO 默认刷新间隔
 
-    private static boolean isWin() {
+    public static boolean isWin() {
         String os = System.getProperty("os.name").toLowerCase();
         return os.contains("win");
     }

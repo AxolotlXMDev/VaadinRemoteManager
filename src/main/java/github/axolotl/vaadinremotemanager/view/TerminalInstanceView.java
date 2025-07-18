@@ -93,7 +93,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
                             lastAccessTime = System.currentTimeMillis(); // 更新最后访问时间
                         }
                     }
-                }), 0, 1, TimeUnit.SECONDS
+                }), 0, 120, TimeUnit.MILLISECONDS
         );
         addDetachListener(detachEvent -> {
             detachEvent.unregisterListener();

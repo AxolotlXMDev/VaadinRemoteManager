@@ -54,7 +54,7 @@ public class ProcessView extends VerticalLayout {
         Button refreshButton = new Button("刷新", VaadinIcon.REFRESH.create());
         refreshButton.addClickListener(event -> {
             processVOService.updateProcessList();
-            UI.getCurrent().accessSynchronously(()->{
+            UI.getCurrent().accessSynchronously(() -> {
                 try {
                     Thread.sleep(150);
                     ViewUtil.reloadPages();
@@ -77,44 +77,44 @@ public class ProcessView extends VerticalLayout {
         processGrid.addComponentColumn(process -> {
 
             Span span;
-            switch (process.getStatus()){
-                case OSProcess.State.RUNNING-> {
+            switch (process.getStatus()) {
+                case OSProcess.State.RUNNING -> {
                     span = new Span("运行");
                     span.getElement().getThemeList().add("badge success");
                 }
-                case OSProcess.State.SLEEPING-> {
+                case OSProcess.State.SLEEPING -> {
                     span = new Span("休眠");
                     span.getElement().getThemeList().add("badge warning");
                 }
-                case OSProcess.State.STOPPED-> {
+                case OSProcess.State.STOPPED -> {
                     span = new Span("停止");
                     span.getElement().getThemeList().add("badge error");
                 }
-                case OSProcess.State.ZOMBIE-> {
+                case OSProcess.State.ZOMBIE -> {
                     span = new Span("僵尸进程");
                     span.getElement().getThemeList().add("badge error");
                 }
-                case OSProcess.State.WAITING-> {
+                case OSProcess.State.WAITING -> {
                     span = new Span("等待中");
                     span.getElement().getThemeList().add("badge info");
                 }
-                case OSProcess.State.SUSPENDED-> {
+                case OSProcess.State.SUSPENDED -> {
                     span = new Span("已挂起");
                     span.getElement().getThemeList().add("badge secondary");
                 }
-                case OSProcess.State.NEW-> {
+                case OSProcess.State.NEW -> {
                     span = new Span("新建");
                     span.getElement().getThemeList().add("badge primary");
                 }
-                case OSProcess.State.INVALID-> {
+                case OSProcess.State.INVALID -> {
                     span = new Span("无效状态");
                     span.getElement().getThemeList().add("badge error");
                 }
-                case OSProcess.State.OTHER-> {
+                case OSProcess.State.OTHER -> {
                     span = new Span("其他状态");
                     span.getElement().getThemeList().add("badge secondary");
                 }
-                default->{
+                default -> {
                     span = new Span("未知状态");
                     span.getElement().getThemeList().add("badge secondary");
                 }
@@ -146,7 +146,7 @@ public class ProcessView extends VerticalLayout {
                 dialog.getHeader().add(closeButton);
                 dialog.open();
             });
-
+            //TODO [A] 增加深浅杀死
             Button killButton = new Button("杀死进程", VaadinIcon.WARNING.create());
             killButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             killButton.addClickListener(event -> {
@@ -176,8 +176,8 @@ public class ProcessView extends VerticalLayout {
 
 
         addFilter(searchField, processDOGridListDataView);
-        H4 lastUpdated = new H4("最后更新: " + DateUtil.formatDate(ProcessVOService.getDate(),"HH:mm:ss"));
-        HorizontalLayout horizontalLayout = new HorizontalLayout(searchField, refreshButton,lastUpdated);
+        H4 lastUpdated = new H4("最后更新: " + DateUtil.formatDate(ProcessVOService.getDate(), "HH:mm:ss"));
+        HorizontalLayout horizontalLayout = new HorizontalLayout(searchField, refreshButton, lastUpdated);
         horizontalLayout.setAlignItems(Alignment.CENTER);
         horizontalLayout.setWidthFull();
         add(horizontalLayout);
@@ -239,7 +239,7 @@ public class ProcessView extends VerticalLayout {
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 cmd = "taskkill /F /PID " + pid;
             } else {
-                cmd = "kill -9 " + pid;
+                cmd = "pkill -P " + pid + " || kill -9 " + pid;
             }
             Process process = Runtime.getRuntime().exec(cmd);
             return process.waitFor() == 0;

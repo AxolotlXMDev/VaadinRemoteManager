@@ -46,8 +46,8 @@ public class MyAppLayout extends AppLayout {
                 new SideNavItem("仪表盘", DashboardView.class, VaadinIcon.DASHBOARD.create()),
                 new SideNavItem("所有进程管理", ProcessView.class, VaadinIcon.OFFICE.create()),
                 new SideNavItem("终端管理", TerminalManagerView.class, VaadinIcon.TERMINAL.create()),
-                new SideNavItem("模板管理", TemplateView.class, VaadinIcon.PAPERCLIP.create()),
-                new SideNavItem("设置", SettingView.class, VaadinIcon.HEADSET.create()),
+                new SideNavItem("模板管理", TemplateView.class, VaadinIcon.COPY.create()),
+                new SideNavItem("设置", SettingView.class, VaadinIcon.COG.create()),
                 new SideNavItem("关于我们", AboutUsView.class, VaadinIcon.ABACUS.create())
         );
         return nav;

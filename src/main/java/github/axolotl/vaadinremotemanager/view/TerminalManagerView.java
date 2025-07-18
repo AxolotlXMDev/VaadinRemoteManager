@@ -162,7 +162,7 @@ public class TerminalManagerView extends VerticalLayout {
             Button killButton = new Button("停止", VaadinIcon.WARNING.create());
             killButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             killButton.addClickListener(event -> {
-                instance.getTerminal().stop();
+                instance.getTerminal().stopForcibly();
                 // 获取数据视图并刷新该项
                 reFreshGridData(instance, instanceGrid);
             });
