@@ -24,12 +24,7 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
-import github.axolotl.vaadinremotemanager.util.ProcessVOService;
-import github.axolotl.vaadinremotemanager.util.ViewUtil;
-import oshi.software.os.OSProcess;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,6 +42,78 @@ public class TemplateView extends VerticalLayout {
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.focus();
+
+
+        Button createTemplateButton = new Button("新建", VaadinIcon.PLUS.create());
+        createTemplateButton.addClickListener(event -> {
+            Dialog dialog = new Dialog();
+            dialog.setHeaderTitle("新建模板");
+
+            // 创建关闭按钮
+            Button closeButton = new Button(new Icon("lumo", "cross"), e -> dialog.close());
+
+            // 创建用于编辑的对象字段
+            TextField nameField = new TextField("名称");
+            nameField.setWidthFull();
+
+            TextField descriptionField = new TextField("描述");
+            descriptionField.setWidthFull();
+
+            TextField startCommandField = new TextField("启动命令");
+            startCommandField.setValue(TerminalTemplateService.getDefaultStartCommand());
+            startCommandField.setWidthFull();
+
+            TextField workingDirectoryField = new TextField("工作目录");
+            workingDirectoryField.setValue(System.getProperty("user.dir"));
+            workingDirectoryField.setWidthFull();
+
+            TextField commandsField = new TextField("命令");
+            commandsField.setPlaceholder("多条命令使用 '<n>' 分隔");
+            commandsField.setWidthFull();
+
+            // 保存按钮
+            Button saveButton = new Button("保存", e -> {
+                TerminalTemplate template = new TerminalTemplate();
+                // 更新对象属性
+                template.setName(nameField.getValue());
+                template.setDescription(descriptionField.getValue());
+                template.setStartCommand(startCommandField.getValue());
+                template.setWorkingDirectory(workingDirectoryField.getValue());
+                template.setCommands(List.of(commandsField.getValue().split("<n>")));
+
+                Notification notification = new Notification("模板已更新", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
+                dialog.close();
+
+                TerminalTemplateService.addTemplate(template);
+                TerminalTemplateService.save();
+
+                UI.getCurrent().getPage().reload();
+            });
+
+            saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+            // 使用 VerticalLayout 布局表单内容
+            VerticalLayout formLayout = new VerticalLayout(
+                    nameField,
+                    descriptionField,
+                    workingDirectoryField,
+                    startCommandField,
+                    commandsField,
+                    saveButton
+            );
+            formLayout.setAlignSelf(Alignment.END, saveButton); // 右对齐 [[8]]
+            formLayout.setSpacing(false);
+
+            // 设置对话框内容
+            dialog.add(formLayout);
+            dialog.setWidth("70%"); // 设置宽度为视口的70%
+            dialog.getHeader().add(closeButton);
+
+            // 打开对话框
+            dialog.open();
+        });
 
 
         List<TerminalTemplate> templateList = TerminalTemplateService.getTemplateList();
@@ -106,6 +173,7 @@ public class TemplateView extends VerticalLayout {
                     notification.open();
                     dialog.close();
 
+                    TerminalTemplateService.save();
                     UI.getCurrent().getPage().reload();
                 });
 
@@ -147,8 +215,10 @@ public class TemplateView extends VerticalLayout {
         templateGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 
 
+        HorizontalLayout horizontalLayout = new HorizontalLayout(searchField, createTemplateButton);
+        horizontalLayout.setWidthFull();
         addFilter(searchField, terminalTemplateGridListDataView);
-        add(searchField);
+        add(horizontalLayout);
         add(templateGrid);
     }
 

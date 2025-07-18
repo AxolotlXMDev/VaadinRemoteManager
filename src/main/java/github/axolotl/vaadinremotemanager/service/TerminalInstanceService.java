@@ -18,8 +18,8 @@ public class TerminalInstanceService {
     private static final HashMap<String,TerminalInstance> instanceMap = new HashMap<>();
 
     static {
-        TerminalInstance terminalInstance = new TerminalInstance(TerminalTemplateService.getTemplateList().get(0));
-        startTerminalInstance(terminalInstance);
+//        TerminalInstance terminalInstance = new TerminalInstance(TerminalTemplateService.getTemplateList().get(0));
+//        startTerminalInstance(terminalInstance);
     }
 
     public static void startTerminalInstance(TerminalInstance terminalInstance) {

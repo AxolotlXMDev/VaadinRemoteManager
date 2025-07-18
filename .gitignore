@@ -34,3 +34,5 @@ build/
 .vscode/
 /src/main/frontend/generated/
 /src/main/bundles/
+/test/
+/data/

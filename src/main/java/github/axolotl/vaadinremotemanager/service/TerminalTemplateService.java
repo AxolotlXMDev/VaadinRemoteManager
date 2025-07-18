@@ -1,9 +1,10 @@
 package github.axolotl.vaadinremotemanager.service;
 
+import dczx.axolotl.util.FileUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
+import github.axolotl.vaadinremotemanager.util.data.TerminalTemplateDataUtil;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,17 +14,34 @@ import java.util.List;
  */
 public class TerminalTemplateService {
     @Getter
-    private static final List<TerminalTemplate> templateList = new ArrayList<>();
+    private static List<TerminalTemplate> templateList;
+    private static final TerminalTemplateDataUtil terminalTemplateDataUtil = new TerminalTemplateDataUtil(FileUtil.keepFileExists("./data/terminal_template.json"));
 
     static {
-        templateList.add(new TerminalTemplate(
-                "默认模板", "默认模板，可用于创建一个空白的终端", System.getProperty("user.dir"),
-                isWin()?"cmd.exe":"bash","echo Hello World!"
-        ));
+        terminalTemplateDataUtil.loadEntity();
+        templateList = terminalTemplateDataUtil.getTerminalTemplateList();
     }
 
-    private static boolean isWin(){
+    private static boolean isWin() {
         String os = System.getProperty("os.name").toLowerCase();
         return os.contains("win");
+    }
+
+    public static String getDefaultStartCommand() {
+        if (isWin()) {
+            return "cmd.exe";
+        } else {
+            return "bash";
+        }
+    }
+
+    public static void save() {
+        terminalTemplateDataUtil.setTerminalTemplateList(templateList);
+        terminalTemplateDataUtil.saveEntity();
+    }
+
+    public static void addTemplate(TerminalTemplate template) {
+        templateList.add(template);
+        save();
     }
 }
