@@ -130,7 +130,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
         terminalSelector.setLabel("切换终端");
         terminalSelector.setPlaceholder("Select terminal");
         terminalSelector.setWidth("60%");
-            terminalSelector.setItems(TerminalInstanceService.getInstanceMap().values());
+            terminalSelector.setItems(TerminalInstanceService.getInstancesList());
             terminalSelector.setValue(instance);
         terminalSelector.addValueChangeListener(event -> {
             String id = event.getValue().getId();

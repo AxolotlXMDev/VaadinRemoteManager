@@ -1,6 +1,7 @@
 package github.axolotl.vaadinremotemanager.util;
 
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -18,6 +19,12 @@ import java.util.List;
  * @since 2025/6/15 1:14
  */
 public class ViewUtil {
+    /**
+     * 刷新当前页面
+     */
+    public static void reloadPages(){
+        UI.getCurrent().getPage().reload();
+    }
     /**
      * 获取抽屉切换按钮
      */

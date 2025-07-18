@@ -45,7 +45,7 @@ public class TerminalInstance {
                 .replace("%TemplateId%", template.getId())
                 .replace("yyyy-MM-dd hh:mm:ss", DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
                 .replace("%hh:mm:ss%", DateUtil.formatDate(new Date(), "hh:mm:ss"))
-                ;
+        ;
     }
 
     public TerminalInstance(String name, TerminalTemplate template) {
@@ -53,26 +53,27 @@ public class TerminalInstance {
         this.template = template;
     }
 
-    public void start() {
+    /**
+     * 启动终端实例
+     *
+     * @param executeCommands 是否执行模板中的命令
+     */
+    public void start(boolean executeCommands) {
         startTime = System.currentTimeMillis();
         id = System.currentTimeMillis() + "-" + TerminalInstanceService.getInstanceMap().size();
         terminal = new ProcessTerminal(template.getStartCommand(), template.getWorkingDirectory());
-        template.getCommands().forEach(command -> {
-            try {
-                terminal.execute(command);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        terminal.regRefreshListener(new TerminalStreamRefresh() {
-            @Override
-            @SneakyThrows
-            public void refresh(InputStream outputStream, InputStream errorStream) {
-                String output = IOUtils.toString(outputStream, Charset.defaultCharset());
-                String error = IOUtils.toString(errorStream, Charset.defaultCharset());
-                System.out.println("Load terminal refresh!");
-            }
-        });
+        if (executeCommands)
+            template.getCommands().forEach(command -> {
+                try {
+                    terminal.execute(command);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+    }
+
+    public void start() {
+        start(true);
     }
 
     public List<SimpleTerminal.HistoryEntry> getHistory() {

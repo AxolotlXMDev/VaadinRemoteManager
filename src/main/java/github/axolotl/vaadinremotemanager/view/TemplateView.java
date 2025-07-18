@@ -27,6 +27,8 @@ import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
 
 import java.util.List;
 
+import static github.axolotl.vaadinremotemanager.util.ViewUtil.reloadPages;
+
 /**
  * @author AxolotlXM
  * @version 1.0
@@ -54,9 +56,11 @@ public class TemplateView extends VerticalLayout {
 
             // 创建用于编辑的对象字段
             TextField nameField = new TextField("名称");
+            nameField.setValue("默认模板");
             nameField.setWidthFull();
 
             TextField descriptionField = new TextField("描述");
+            descriptionField.setValue("默认描述");
             descriptionField.setWidthFull();
 
             TextField startCommandField = new TextField("启动命令");
@@ -81,7 +85,7 @@ public class TemplateView extends VerticalLayout {
                 template.setWorkingDirectory(workingDirectoryField.getValue());
                 template.setCommands(List.of(commandsField.getValue().split("<n>")));
 
-                Notification notification = new Notification("模板已更新", 3000);
+                Notification notification = new Notification("模板新建成功", 3000);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 notification.open();
                 dialog.close();
@@ -89,7 +93,7 @@ public class TemplateView extends VerticalLayout {
                 TerminalTemplateService.addTemplate(template);
                 TerminalTemplateService.save();
 
-                UI.getCurrent().getPage().reload();
+                reloadPages();
             });
 
             saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -174,7 +178,7 @@ public class TemplateView extends VerticalLayout {
                     dialog.close();
 
                     TerminalTemplateService.save();
-                    UI.getCurrent().getPage().reload();
+                    reloadPages();
                 });
 
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

@@ -18,12 +18,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
+import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 
 import java.util.Date;
+
+import static github.axolotl.vaadinremotemanager.util.ViewUtil.reloadPages;
 
 /**
  * @author AxolotlXM
@@ -117,9 +120,41 @@ public class TerminalManagerView extends VerticalLayout {
                 dialog.open();
             });
 
+            //按照模板执行
+            Button shallowCopyButton = new Button("浅复制", VaadinIcon.COPY.create());
+            shallowCopyButton.addClickListener(event -> {
+                TerminalInstance copyInstance = new TerminalInstance(instance.getTemplate());
+                copyInstance.setName(instance.getName() + " - 浅副本");
+                copyInstance.start(true);
+
+                reloadPages();
+                TerminalInstanceService.putTerminalInstance(copyInstance);
+                Notification notification = new Notification("已创建新终端实例", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
+
+            });
             //复制一个终端 按照历史执行
-            Button copyButton = new Button("复制", VaadinIcon.COPY.create());
-            copyButton.addClickListener(event -> {
+            Button deepCopyButton = new Button("深复制", VaadinIcon.COPY.create());
+            deepCopyButton.addClickListener(event -> {
+                TerminalInstance copyInstance = new TerminalInstance(instance.getTemplate());
+                copyInstance.setName(instance.getName() + " - 深副本");
+                copyInstance.start(false);
+                instance.getHistory()
+                        .stream()
+                        .filter(historyEntry -> historyEntry.type == SimpleTerminal.HistoryEntry.Type.INPUT)
+                        .forEach(historyEntry -> {
+                            try {
+                                copyInstance.getTerminal().execute(historyEntry.content);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                reloadPages();
+                TerminalInstanceService.putTerminalInstance(copyInstance);
+                Notification notification = new Notification("已创建新终端实例", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
 
             });
 
@@ -134,9 +169,10 @@ public class TerminalManagerView extends VerticalLayout {
 
             jumpButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             settingButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            copyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            shallowCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            deepCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(jumpButton, settingButton, copyButton, killButton);
+            return new HorizontalLayout(jumpButton, settingButton, shallowCopyButton, deepCopyButton, killButton);
         }).setHeader("操作").setWidth("150%");
 
         instanceGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -150,7 +186,6 @@ public class TerminalManagerView extends VerticalLayout {
         add(searchField);
         add(instanceGrid);
     }
-
 
 
     private static void reFreshGridData(TerminalInstance instance, Grid<TerminalInstance> instanceGrid) {
