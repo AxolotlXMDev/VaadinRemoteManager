@@ -11,6 +11,7 @@ import oshi.software.os.OSProcess;
 import oshi.software.os.OperatingSystem;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,8 @@ import static github.axolotl.vaadinremotemanager.util.ServiceUtil.isRecentlyAcce
 public class ProcessVOService {
     @Getter
     private static List<ProcessEntity> processList;//存放最新的VO对象
-
+    @Getter
+    private static Date date;
     private static List<ProcessEntity> getAllProcesses() {
         // 创建系统信息对象
         SystemInfo systemInfo = new SystemInfo();
@@ -64,12 +66,12 @@ public class ProcessVOService {
                 .collect(Collectors.toList());
     }
     // 每隔fixedRate执行一次
-    @Scheduled(fixedRate = 8 * 1000)
+    @Scheduled(fixedRate = 12 * 1000)
     @SneakyThrows
     public void FastCheck() {
         //最近有访问就快速更新
         if (isRecentlyAccessed())
-            processList = getAllProcesses();
+            updateProcessList();
     }
 
     // 每隔fixedRate执行一次 延迟initialDelay执行
@@ -77,7 +79,11 @@ public class ProcessVOService {
     @SneakyThrows
     public void LongTimeCheck() {
         if (!isRecentlyAccessed())
-            processList = getAllProcesses();
+            updateProcessList();
+    }
+    public void updateProcessList() {
+        date = new Date();
+        processList = getAllProcesses();
     }
 
 

@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.html.*;
@@ -10,13 +11,18 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.SystemStatusService;
+import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("/")
 public class DashboardView extends VerticalLayout {
+    @Autowired
+    private SystemStatusService systemStatusService;
     public DashboardView() {
         setPadding(true);
         setSpacing(true);
@@ -30,24 +36,36 @@ public class DashboardView extends VerticalLayout {
 
     public void DashboardViewTest(github.axolotl.vaadinremotemanager.entity.SystemStatus systemStatus, VerticalLayout content) {
         // 1. 创建顶部标题和刷新按钮
+        Button refreshButton = new Button("刷新", VaadinIcon.REFRESH.create());
+        refreshButton.addClickListener(event -> {
+            systemStatusService.updateSystemStatus(400,400);
+            UI.getCurrent().accessSynchronously(()->{
+                try {
+                    Thread.sleep(450);
+                    ViewUtil.reloadPages();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
+
+        H4 lastUpdated = new H4("最后更新: " + DateUtil.formatDate(systemStatus.getDate(),"HH:mm:ss"));
         HorizontalLayout header = new HorizontalLayout(
                 new H2("系统概览"),
-                new Button("刷新", VaadinIcon.REFRESH.create())
+                refreshButton,
+                lastUpdated
         );
         header.setWidthFull();
-        header.setJustifyContentMode(JustifyContentMode.BETWEEN);
         header.setAlignItems(Alignment.CENTER);
 
-        Span lastUpdated = new Span("最后更新: " + systemStatus.getDate());
-        header.add(lastUpdated);
 
         // 在DashboardViewTest方法中修改statsRow的创建
         // 2. 创建状态卡片行
         HorizontalLayout statsRow = new HorizontalLayout(
-                createStatCard("CPU 使用率", String.format("%.2f%%", systemStatus.getCpuLoad()), VaadinIcon.COG, systemStatus.getCpuLoad()),
+                createStatCard("CPU 使用率", String.format("%.2f%%", systemStatus.getCpuLoad()), VaadinIcon.TIMER, systemStatus.getCpuLoad()),
                 createStatCard("内存使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedMemory(), systemStatus.getTotalMemory()), VaadinIcon.DATABASE, systemStatus.getMemoryLoad()),
-                createStatCard("磁盘使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedDisk(), systemStatus.getTotalDisk()), VaadinIcon.CALC, systemStatus.getDiskUsagePercent()),
-                createStatCard("网络流量", String.format("%.2f KB/s ↑\n%.2f KB/s ↓", systemStatus.getNetworkUplink(), systemStatus.getNetworkDownlink()), VaadinIcon.GLOBE, null));
+                createStatCard("磁盘使用", String.format("%.2f GB / %.2f GB", systemStatus.getUsedDisk(), systemStatus.getTotalDisk()), VaadinIcon.FILE_TEXT, systemStatus.getDiskUsagePercent()),
+                createStatCard("网络流量", String.format("%.2f KB/s ↑\n%.2f KB/s ↓", systemStatus.getNetworkUplink(), systemStatus.getNetworkDownlink()), VaadinIcon.SIGNAL, null));
         statsRow.setWidthFull();
         statsRow.setSpacing(true); // 添加卡片间距
         statsRow.addClassName(LumoUtility.FlexWrap.WRAP); // 允许在小屏幕上换行

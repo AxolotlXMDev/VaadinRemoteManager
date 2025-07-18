@@ -1,11 +1,13 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -21,10 +23,7 @@ import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
-import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import oshi.software.os.OSProcess;
 
 import java.util.*;
@@ -37,6 +36,9 @@ import java.util.*;
 @Route("/process")
 public class ProcessView extends VerticalLayout {
 
+    @Autowired
+    private ProcessVOService processVOService;
+
     public ProcessView() {
         VaadinRemoteManagerApplication.setLastAccessTime(System.currentTimeMillis());
         setSizeFull();
@@ -48,6 +50,19 @@ public class ProcessView extends VerticalLayout {
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.focus();
+
+        Button refreshButton = new Button("刷新", VaadinIcon.REFRESH.create());
+        refreshButton.addClickListener(event -> {
+            processVOService.updateProcessList();
+            UI.getCurrent().accessSynchronously(()->{
+                try {
+                    Thread.sleep(150);
+                    ViewUtil.reloadPages();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        });
 
         List<ProcessEntity> processList = ProcessVOService.getProcessList();
         Grid<ProcessEntity> processGrid = new Grid<>();
@@ -62,12 +77,47 @@ public class ProcessView extends VerticalLayout {
         processGrid.addComponentColumn(process -> {
 
             Span span;
-            if (process.getStatus().equals(OSProcess.State.RUNNING)) {
-                span = new Span("运行中");
-                span.getElement().getThemeList().add("badge success");
-            } else {
-                span = new Span("停止");
-                span.getElement().getThemeList().add("badge error");
+            switch (process.getStatus()){
+                case OSProcess.State.RUNNING-> {
+                    span = new Span("运行");
+                    span.getElement().getThemeList().add("badge success");
+                }
+                case OSProcess.State.SLEEPING-> {
+                    span = new Span("休眠");
+                    span.getElement().getThemeList().add("badge warning");
+                }
+                case OSProcess.State.STOPPED-> {
+                    span = new Span("停止");
+                    span.getElement().getThemeList().add("badge error");
+                }
+                case OSProcess.State.ZOMBIE-> {
+                    span = new Span("僵尸进程");
+                    span.getElement().getThemeList().add("badge error");
+                }
+                case OSProcess.State.WAITING-> {
+                    span = new Span("等待中");
+                    span.getElement().getThemeList().add("badge info");
+                }
+                case OSProcess.State.SUSPENDED-> {
+                    span = new Span("已挂起");
+                    span.getElement().getThemeList().add("badge secondary");
+                }
+                case OSProcess.State.NEW-> {
+                    span = new Span("新建");
+                    span.getElement().getThemeList().add("badge primary");
+                }
+                case OSProcess.State.INVALID-> {
+                    span = new Span("无效状态");
+                    span.getElement().getThemeList().add("badge error");
+                }
+                case OSProcess.State.OTHER-> {
+                    span = new Span("其他状态");
+                    span.getElement().getThemeList().add("badge secondary");
+                }
+                default->{
+                    span = new Span("未知状态");
+                    span.getElement().getThemeList().add("badge secondary");
+                }
             }
             return span;
         }).setHeader("运行状态").setSortable(true).setWidth("4%");
@@ -126,7 +176,11 @@ public class ProcessView extends VerticalLayout {
 
 
         addFilter(searchField, processDOGridListDataView);
-        add(searchField);
+        H4 lastUpdated = new H4("最后更新: " + DateUtil.formatDate(ProcessVOService.getDate(),"HH:mm:ss"));
+        HorizontalLayout horizontalLayout = new HorizontalLayout(searchField, refreshButton,lastUpdated);
+        horizontalLayout.setAlignItems(Alignment.CENTER);
+        horizontalLayout.setWidthFull();
+        add(horizontalLayout);
         add(processGrid);
     }
 

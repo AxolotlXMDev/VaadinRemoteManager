@@ -51,13 +51,13 @@ public class TerminalManagerView extends VerticalLayout {
 
 
         Grid<TerminalInstance> instanceGrid = new Grid<>();
-        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("20%");
+        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("35%");
 
         instanceGrid.addColumn(instance -> DateUtil.formatDate(new Date(instance.getStartTime())))
-                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("20%");
+                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("12%");
         instanceGrid.sort(GridSortOrder.desc(instanceGrid.getColumnByKey("time")).build());
 
-        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("20%");
+        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("12%");
 
         instanceGrid.addComponentColumn(instance -> {
             Span span;
@@ -69,7 +69,7 @@ public class TerminalManagerView extends VerticalLayout {
                 span.getElement().getThemeList().add("badge error");
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("12%");
+        }).setHeader("运行状态").setSortable(true).setWidth("10%");
 
         instanceGrid.addComponentColumn(instance -> {
             Button jumpButton = new Button("跳转", VaadinIcon.PLAY_CIRCLE.create());
@@ -173,7 +173,7 @@ public class TerminalManagerView extends VerticalLayout {
             deepCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             return new HorizontalLayout(jumpButton, settingButton, shallowCopyButton, deepCopyButton, killButton);
-        }).setHeader("操作").setWidth("150%");
+        }).setHeader("操作").setWidth("130%");
 
         instanceGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         instanceGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);

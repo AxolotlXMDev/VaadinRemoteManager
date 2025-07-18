@@ -4,6 +4,7 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.*;
 
@@ -56,8 +57,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
     private static final int getHistoryDelay = 1;
     private static int refreshDelay = 700;
     private TextField commandInput;
-    private ComboBox<String> historyComboBox;
-    private ComboBox<TerminalInstance> terminalSelector = new ComboBox<>();
+    private Select<String> historyComboBox;
 
 
     public TerminalInstanceView() {
@@ -126,12 +126,12 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
             refreshDelay = event.getValue();
         });
 
-        terminalSelector = new ComboBox<>();
+        Select<TerminalInstance> terminalSelector = new Select<>();
         terminalSelector.setLabel("切换终端");
         terminalSelector.setPlaceholder("Select terminal");
         terminalSelector.setWidth("60%");
-            terminalSelector.setItems(TerminalInstanceService.getInstancesList());
-            terminalSelector.setValue(instance);
+        terminalSelector.setItems(TerminalInstanceService.getInstancesList());
+        terminalSelector.setValue(instance);
         terminalSelector.addValueChangeListener(event -> {
             String id = event.getValue().getId();
             UI.getCurrent().navigate(AboutUsView.class);//必须先切换走 否则会被认为是同一个页面不重新路由
@@ -168,7 +168,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
 
         Button sendButton = new Button("Send", e -> sendCommand());
 
-        historyComboBox = new ComboBox<>();
+        historyComboBox = new Select<>();
         historyComboBox.setPlaceholder("History commands");
         historyComboBox.setWidth("200px");
         historyComboBox.addValueChangeListener(e -> {

@@ -4,6 +4,7 @@ package github.axolotl.vaadinremotemanager.util;
 import github.axolotl.vaadinremotemanager.entity.SystemStatus;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -31,8 +32,6 @@ import static github.axolotl.vaadinremotemanager.util.ServiceUtil.isRecentlyAcce
 public class SystemStatusService {
     @Getter
     private static SystemStatus systemStatus;//存放最新的VO对象
-
-
 
     /**
      * 主方法用于运行系统监控程序。
@@ -117,20 +116,29 @@ public class SystemStatusService {
 
 
     // 每隔fixedRate执行一次
-    @Scheduled(fixedRate = 7 * 1000)
+    @Scheduled(fixedRate = 13 * 1000)
     @SneakyThrows
     public void FastCheck() {
         //最近有访问就快速更新
-        if (isRecentlyAccessed())
-            systemStatus = requestSystemStatus(1000, 1000);
+        if (isRecentlyAccessed()) {
+            updateSystemStatus(2000, 2000);
+        }
     }
 
     // 每隔fixedRate执行一次 延迟initialDelay执行
-    @Scheduled(fixedRate = 60 * 1000, initialDelay = 20 * 1000)
+    @Scheduled(fixedRate = 3*60 * 1000, initialDelay = 20 * 1000)
     @SneakyThrows
     public void LongTimeCheck() {
         if (!isRecentlyAccessed())
-            systemStatus = requestSystemStatus(3000, 3000);
+            updateSystemStatus(6000, 6000);
+    }
+
+    public void updateSystemStatus(int cpuCheckTime, int networkCheckTime) {
+        try {
+            systemStatus = requestSystemStatus(cpuCheckTime, networkCheckTime);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @PostConstruct
