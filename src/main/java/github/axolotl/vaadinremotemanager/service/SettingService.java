@@ -22,4 +22,18 @@ public class SettingService {
     public static void save() {
         settingUtil.saveEntity(setting);
     }
+
+
+    private static boolean isWin() {
+        String os = System.getProperty("os.name").toLowerCase();
+        return os.contains("win");
+    }
+
+    public static String getDefaultStartCommand() {
+        if (isWin()) {
+            return "cmd.exe";
+        } else {
+            return "bash";
+        }
+    }
 }

@@ -4,6 +4,7 @@ import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.terminal.TerminalStreamRefresh;
 import dczx.axolotl.util.DateUtil;
+import github.axolotl.vaadinremotemanager.service.SettingService;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import lombok.Data;
 import lombok.Getter;
@@ -38,7 +39,13 @@ public class TerminalInstance {
 
     public TerminalInstance(TerminalTemplate template) {
         this.template = template;
-        name = template.getName() + " - " + DateUtil.formatDate(new Date(), "hh:mm:ss");
+
+        name = SettingService.getSetting().getDefaultTerminalName()
+                .replace("%TemplateName%", template.getName())
+                .replace("%TemplateId%", template.getId())
+                .replace("yyyy-MM-dd hh:mm:ss", DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
+                .replace("%hh:mm:ss%", DateUtil.formatDate(new Date(), "hh:mm:ss"))
+                ;
     }
 
     public TerminalInstance(String name, TerminalTemplate template) {

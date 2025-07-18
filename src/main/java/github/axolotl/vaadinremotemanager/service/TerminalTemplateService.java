@@ -22,18 +22,6 @@ public class TerminalTemplateService {
         templateList = terminalTemplateDataUtil.getTerminalTemplateList();
     }
 
-    private static boolean isWin() {
-        String os = System.getProperty("os.name").toLowerCase();
-        return os.contains("win");
-    }
-
-    public static String getDefaultStartCommand() {
-        if (isWin()) {
-            return "cmd.exe";
-        } else {
-            return "bash";
-        }
-    }
 
     public static void save() {
         terminalTemplateDataUtil.setTerminalTemplateList(templateList);
@@ -43,5 +31,9 @@ public class TerminalTemplateService {
     public static void addTemplate(TerminalTemplate template) {
         templateList.add(template);
         save();
+    }
+
+    public static String getDefaultStartCommand() {
+        return SettingService.getSetting().getDefaultStartCommand();
     }
 }

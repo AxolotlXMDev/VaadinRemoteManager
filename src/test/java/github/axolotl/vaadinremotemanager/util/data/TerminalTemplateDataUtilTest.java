@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class TerminalTemplateDataUtilTest {
 
-    static File file = FileUtil.keepFileExists("./test/test.json");
+    static File file = FileUtil.keepFileExists("./test/terminal_template.json");
 
     @Test
     public void testLoad() {
