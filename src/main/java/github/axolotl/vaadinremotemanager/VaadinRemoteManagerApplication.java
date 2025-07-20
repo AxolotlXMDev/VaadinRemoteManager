@@ -28,6 +28,8 @@ public class VaadinRemoteManagerApplication implements AppShellConfigurator {
     public static void main(String[] args) {
         SpringApplication.run(VaadinRemoteManagerApplication.class, args);
 
+        SettingService.save();
+
         List<String> selfStartList = SettingService.getSetting().getSelfStartList();
         System.out.printf("自启动项(%d):\n", selfStartList.size());
         TerminalTemplateService.getTemplateList()

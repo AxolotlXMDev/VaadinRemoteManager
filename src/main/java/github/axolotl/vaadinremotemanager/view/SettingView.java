@@ -8,6 +8,7 @@ import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
@@ -41,6 +42,10 @@ public class SettingView extends VerticalLayout {
         defaultTerminalNameField.setValue(setting.getDefaultTerminalName());
         defaultTerminalNameField.setWidthFull();
 
+        IntegerField defaultRefreshDelayField = new IntegerField("默认终端刷新间隔");
+        defaultRefreshDelayField.setValue(setting.getDefaultRefreshDelay());
+        defaultRefreshDelayField.setWidthFull();
+
         Span selfStartListSpan = new Span(("自启动终端列表"));
         MultiSelectListBox<TerminalTemplate> selfStartList = new MultiSelectListBox<>();
         selfStartList.setItems(TerminalTemplateService.getTemplateList());
@@ -72,6 +77,7 @@ public class SettingView extends VerticalLayout {
             setting.setDefaultWorkingDirectory(defaultWorkingDirectoryField.getValue());
             setting.setDefaultStartCommand(defaultStartCommandField.getValue());
             setting.setDefaultTerminalName(defaultTerminalNameField.getValue());
+            setting.setDefaultRefreshDelay(defaultRefreshDelayField.getValue());
             setting.setSelfStartList(selfStartList.getSelectedItems().stream().map(TerminalTemplate::getId).toList());
 
             SettingService.setSetting(setting);
@@ -84,6 +90,7 @@ public class SettingView extends VerticalLayout {
         add(defaultWorkingDirectoryField);
         add(defaultStartCommandField);
         add(defaultTerminalNameField);
+        add(defaultRefreshDelayField);
         add(new Hr());
         add(selfStartListSpan);
         add(selfStartList);

@@ -18,8 +18,10 @@ import com.vaadin.flow.component.textfield.TextField;
 import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.terminal.TerminalStringRefresh;
+import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
+import github.axolotl.vaadinremotemanager.service.SettingService;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import lombok.SneakyThrows;
 
@@ -54,7 +56,7 @@ public class TerminalInstanceView extends VerticalLayout implements BeforeEnterO
 
     private Div historyDisplay;
     private static final int getHistoryDelay = 1;
-    private static int refreshDelay = 700;
+    private static int refreshDelay = SettingService.getSetting().getDefaultRefreshDelay();
     private TextField commandInput;
     private Select<String> historyComboBox;
 
