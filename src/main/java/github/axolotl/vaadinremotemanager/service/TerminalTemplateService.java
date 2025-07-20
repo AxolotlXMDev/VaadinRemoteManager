@@ -33,7 +33,13 @@ public class TerminalTemplateService {
         save();
     }
 
+    public static void removeTemplate(TerminalTemplate template) {
+        templateList.remove(template);
+        save();
+    }
+
     public static String getDefaultStartCommand() {
         return SettingService.getSetting().getDefaultStartCommand();
     }
+
 }

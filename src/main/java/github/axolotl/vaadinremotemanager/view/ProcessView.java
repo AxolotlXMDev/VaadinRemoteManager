@@ -148,7 +148,6 @@ public class ProcessView extends VerticalLayout {
                 dialog.getHeader().add(closeButton);
                 dialog.open();
             });
-            //TODO [A] 增加深浅杀死
             Button shallowKillButton = new Button("浅杀死", VaadinIcon.WARNING.create());
             shallowKillButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             shallowKillButton.addClickListener(event -> {

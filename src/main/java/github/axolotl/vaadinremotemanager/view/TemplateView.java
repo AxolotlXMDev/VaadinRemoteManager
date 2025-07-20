@@ -126,8 +126,8 @@ public class TemplateView extends VerticalLayout {
 
 
         templateGrid.addColumn(TerminalTemplate::getDescription).setHeader("描述").setSortable(true).setWidth("15%");
-        templateGrid.addColumn(TerminalTemplate::getCommands).setHeader("命令").setSortable(true).setWidth("30%");
-        templateGrid.addColumn(TerminalTemplate::getWorkingDirectory).setHeader("工作目录").setSortable(true).setWidth("25%");
+        templateGrid.addColumn(TerminalTemplate::getCommands).setHeader("命令").setSortable(true).setWidth("22%");
+        templateGrid.addColumn(TerminalTemplate::getWorkingDirectory).setHeader("工作目录").setSortable(true).setWidth("22%");
 
         GridListDataView<TerminalTemplate> terminalTemplateGridListDataView = templateGrid.setItems(templateList);
 
@@ -217,6 +217,20 @@ public class TemplateView extends VerticalLayout {
                 reloadPages();
             });
 
+
+            Button removeButton = new Button("删除", VaadinIcon.FILE_REMOVE.create());
+            removeButton.addClickListener(event -> {
+                TerminalTemplateService.removeTemplate(template);
+                TerminalTemplateService.save();
+
+                Notification notification = new Notification("模板删除成功", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
+                reloadPages();
+            });
+            removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+
             //从模板启动和模板修改启动
             Button luanchButton = new Button("启动", VaadinIcon.PLAY.create());
             luanchButton.addClickListener(event -> {
@@ -225,10 +239,11 @@ public class TemplateView extends VerticalLayout {
 
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             copyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            removeButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             luanchButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
-            return new HorizontalLayout(infoButton,copyButton, luanchButton);
-        }).setHeader("操作").setWidth("15%");
+            return new HorizontalLayout(infoButton, copyButton, removeButton, luanchButton);
+        }).setHeader("操作").setWidth("20%");
 
         templateGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         templateGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
