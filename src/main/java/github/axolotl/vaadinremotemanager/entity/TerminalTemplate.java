@@ -39,4 +39,7 @@ public class TerminalTemplate {
             id = UUID.randomUUID().toString();
         }
     }
+    public TerminalTemplate copy() {
+        return new TerminalTemplate(name, description, workingDirectory, startCommand, commands.toArray(new String[0]));
+    }
 }

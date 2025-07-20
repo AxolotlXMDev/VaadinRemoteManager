@@ -204,6 +204,19 @@ public class TemplateView extends VerticalLayout {
                 dialog.open();
             });
 
+
+            Button copyButton = new Button("复制", VaadinIcon.COPY.create());
+            copyButton.addClickListener(event -> {
+                TerminalTemplate newTemplate = template.copy();
+                newTemplate.setName(newTemplate.getName() + " - 副本");
+                TerminalTemplateService.addTemplate(newTemplate);
+                TerminalTemplateService.save();
+                Notification notification = new Notification("模板复制成功", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
+                reloadPages();
+            });
+
             //从模板启动和模板修改启动
             Button luanchButton = new Button("启动", VaadinIcon.PLAY.create());
             luanchButton.addClickListener(event -> {
@@ -211,9 +224,11 @@ public class TemplateView extends VerticalLayout {
             });
 
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            copyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             luanchButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(infoButton, luanchButton);
-        }).setHeader("操作").setWidth("9%");
+
+            return new HorizontalLayout(infoButton,copyButton, luanchButton);
+        }).setHeader("操作").setWidth("15%");
 
         templateGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         templateGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);

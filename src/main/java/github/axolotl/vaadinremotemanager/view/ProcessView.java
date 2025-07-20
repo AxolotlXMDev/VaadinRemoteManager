@@ -18,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
+import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
@@ -65,9 +66,10 @@ public class ProcessView extends VerticalLayout {
         });
 
         List<ProcessEntity> processList = ProcessVOService.getProcessList();
+        processList.sort((p1, p2) -> Math.toIntExact(p2.getPid() - p1.getPid()));
+
         Grid<ProcessEntity> processGrid = new Grid<>();
         processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("2%");
-
 
         processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("30%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用").setSortable(true).setWidth("5%");
@@ -147,25 +149,28 @@ public class ProcessView extends VerticalLayout {
                 dialog.open();
             });
             //TODO [A] 增加深浅杀死
-            Button killButton = new Button("杀死进程", VaadinIcon.WARNING.create());
-            killButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-            killButton.addClickListener(event -> {
-                boolean success = killProcess(process.getPid());
-                if (success) {
-                    processList.remove(process);
-                    Notification.show("进程已终止: " + process.getName(), 1200, Notification.Position.MIDDLE);
-                    // Refresh the grid
-                    GridListDataView<ProcessEntity> processDOGridListDataView = processGrid.setItems(ProcessVOService.getProcessList());
-                    addFilter(searchField, processDOGridListDataView);
-                    searchField.focus();
-                } else {
-                    Notification.show("终止进程失败: " + process.getName(), 1000, Notification.Position.MIDDLE)
-                            .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                }
+            Button shallowKillButton = new Button("浅杀死", VaadinIcon.WARNING.create());
+            shallowKillButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            shallowKillButton.addClickListener(event -> {
+                ProcessTerminal.killProcess(process.getPid(), false);
+                processList.remove(process);
+                Notification.show("进程已终止: " + process.getName(), 1200, Notification.Position.MIDDLE);
+                reloadGrid(processGrid, searchField);
+
+            });
+            Button deepKillButton = new Button("深杀死", VaadinIcon.WARNING.create());
+            deepKillButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            deepKillButton.addClickListener(event -> {
+                ProcessTerminal.killProcess(process.getPid(), true);
+                processList.remove(process);
+                Notification.show("进程已终止: " + process.getName(), 1200, Notification.Position.MIDDLE);
+                reloadGrid(processGrid, searchField);
+
             });
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(infoButton, killButton);
+            shallowKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            deepKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            return new HorizontalLayout(infoButton, shallowKillButton,deepKillButton);
         }).setHeader("操作").setWidth("7%");
 
         processGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
@@ -182,6 +187,12 @@ public class ProcessView extends VerticalLayout {
         horizontalLayout.setWidthFull();
         add(horizontalLayout);
         add(processGrid);
+    }
+
+    private void reloadGrid(Grid<ProcessEntity> processGrid, TextField searchField) {
+        GridListDataView<ProcessEntity> processDOGridListDataView = processGrid.setItems(ProcessVOService.getProcessList());
+        addFilter(searchField, processDOGridListDataView);
+        searchField.focus();
     }
 
 
@@ -233,18 +244,4 @@ public class ProcessView extends VerticalLayout {
         dialog.open();
     }
 
-    private boolean killProcess(int pid) {
-        try {
-            String cmd;
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                cmd = "taskkill /F /PID " + pid;
-            } else {
-                cmd = "pkill -P " + pid + " || kill -9 " + pid;
-            }
-            Process process = Runtime.getRuntime().exec(cmd);
-            return process.waitFor() == 0;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }
