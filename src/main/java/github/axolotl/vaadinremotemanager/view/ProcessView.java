@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.util.DateUtil;
@@ -24,6 +25,7 @@ import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import oshi.software.os.OSProcess;
 
@@ -35,6 +37,8 @@ import java.util.*;
  * @since 2025/6/29 20:58
  */
 @Route("/process")
+@PageTitle("进程管理")
+@RolesAllowed("ADMIN")
 public class ProcessView extends VerticalLayout {
 
     @Autowired
@@ -69,11 +73,13 @@ public class ProcessView extends VerticalLayout {
         processList.sort((p1, p2) -> Math.toIntExact(p2.getPid() - p1.getPid()));
 
         Grid<ProcessEntity> processGrid = new Grid<>();
-        processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("2%");
+        processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("3%");
 
-        processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("30%");
-        processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用").setSortable(true).setWidth("5%");
-        processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用").setSortable(true).setWidth("5%");
+        processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("40%");
+        processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用")
+                .setSortable(true).setWidth("4%");
+        processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用")
+                .setSortable(true).setWidth("4%");
 
 
         processGrid.addComponentColumn(process -> {
@@ -122,7 +128,7 @@ public class ProcessView extends VerticalLayout {
                 }
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("4%");
+        }).setHeader("运行状态").setSortable(true).setWidth("2%");
 
         // Add kill process button column with red background
         processGrid.addComponentColumn(process -> {
@@ -141,7 +147,7 @@ public class ProcessView extends VerticalLayout {
                 data.add(List.of("工作目录", osProcess.getCurrentWorkingDirectory()));
                 data.add(List.of("启动时间", DateUtil.formatDate(new Date(osProcess.getStartTime()))));
 
-                Grid<List<Object>> grid = ViewUtil.createDataGrid(data, List.of("10%", "90%"));
+                Grid<List<Object>> grid = ViewUtil.createDataGrid(data, List.of("10%", "9%"));
 
                 dialog.add(grid);
                 dialog.setWidth("70%"); // 视口宽度的50%
@@ -169,12 +175,11 @@ public class ProcessView extends VerticalLayout {
             infoButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             shallowKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             deepKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(infoButton, shallowKillButton,deepKillButton);
-        }).setHeader("操作").setWidth("7%");
+            return new HorizontalLayout(infoButton, shallowKillButton, deepKillButton);
+        }).setHeader("操作").setWidth("15%");
 
         processGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         processGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-
 
         GridListDataView<ProcessEntity> processDOGridListDataView = processGrid.setItems(processList);
 

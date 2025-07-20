@@ -3,7 +3,10 @@ package github.axolotl.vaadinremotemanager.view;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 /**
  * @author AxolotlXM
@@ -11,6 +14,8 @@ import com.vaadin.flow.router.Route;
  * @since 2025/6/21 17:16
  */
 @Route("/about-us")
+@PageTitle("About Us")
+@AnonymousAllowed
 public class AboutUsView extends VerticalLayout {
     public AboutUsView() {
         setPadding(true);

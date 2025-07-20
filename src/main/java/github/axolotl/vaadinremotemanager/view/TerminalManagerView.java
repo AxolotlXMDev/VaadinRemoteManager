@@ -17,12 +17,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import dczx.axolotl.terminal.SimpleTerminal;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
 
@@ -33,6 +35,8 @@ import static github.axolotl.vaadinremotemanager.util.ViewUtil.reloadPages;
  * @version 1.0
  * @since 2025/7/16 17:38
  */
+@PageTitle("终端管理")
+@RolesAllowed("ADMIN")
 @Route("/terminal-manager")
 public class TerminalManagerView extends VerticalLayout {
     public TerminalManagerView() {

@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
@@ -24,6 +25,7 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
@@ -35,6 +37,8 @@ import static github.axolotl.vaadinremotemanager.util.ViewUtil.reloadPages;
  * @since 2025/7/13 18:32
  */
 @Route("/template")
+@PageTitle("模板管理")
+@RolesAllowed("ADMIN")
 public class TemplateView extends VerticalLayout {
 
     public TemplateView() {

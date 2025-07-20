@@ -22,6 +22,7 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.SettingService;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.SneakyThrows;
 
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.stream.Collectors;
  * @since 2025/7/5 11:07
  */
 
+@PageTitle("终端实例")
+@RolesAllowed("ADMIN")
 @Route("/terminal-instance/:terminalId?")
 public class TerminalInstanceView extends VerticalLayout implements BeforeEnterObserver {
 

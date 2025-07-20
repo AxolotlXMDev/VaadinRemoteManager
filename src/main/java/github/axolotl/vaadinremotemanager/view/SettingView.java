@@ -11,11 +11,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.SettingService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
+import jakarta.annotation.security.RolesAllowed;
 
 
 /**
@@ -24,6 +26,8 @@ import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
  * @since 2025/7/5 11:07
  */
 @Route("/setting")
+@PageTitle("设置")
+@RolesAllowed("ADMIN")
 public class SettingView extends VerticalLayout {
     public SettingView() {
         SettingEntity setting = SettingService.getSetting();

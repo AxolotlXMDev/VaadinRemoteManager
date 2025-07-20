@@ -12,7 +12,9 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.util.DateUtil;
@@ -22,12 +24,15 @@ import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
 import github.axolotl.vaadinremotemanager.util.SystemStatusService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("/")
+@PageTitle("仪表盘")
+@RolesAllowed("ADMIN")
 public class DashboardView extends VerticalLayout {
     @Autowired
     private SystemStatusService systemStatusService;

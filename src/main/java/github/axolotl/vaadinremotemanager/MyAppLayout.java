@@ -7,6 +7,7 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.view.*;
@@ -19,6 +20,7 @@ import github.axolotl.vaadinremotemanager.view.*;
  */
 //用于定义应用程序的布局
 @Layout
+@AnonymousAllowed
 public class MyAppLayout extends AppLayout {
 
     public MyAppLayout() {
