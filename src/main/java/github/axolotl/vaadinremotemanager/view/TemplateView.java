@@ -15,6 +15,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -163,8 +164,8 @@ public class TemplateView extends VerticalLayout {
                 workingDirectoryField.setValue(template.getWorkingDirectory());
                 workingDirectoryField.setWidthFull();
 
-                TextField commandsField = new TextField("命令");
-                commandsField.setValue(String.join("<n>", template.getCommands()));
+                TextArea commandsField = new TextArea("命令");
+                commandsField.setValue(String.join("\n", template.getCommands()));
                 commandsField.setWidthFull();
 
                 // 保存按钮
@@ -174,7 +175,7 @@ public class TemplateView extends VerticalLayout {
                     template.setDescription(descriptionField.getValue());
                     template.setStartCommand(startCommandField.getValue());
                     template.setWorkingDirectory(workingDirectoryField.getValue());
-                    template.setCommands(List.of(commandsField.getValue().split("<n>")));
+                    template.setCommands(List.of(commandsField.getValue().split("\n")));
 
                     Notification notification = new Notification("模板已更新", 3000);
                     notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
