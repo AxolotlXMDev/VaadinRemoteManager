@@ -42,4 +42,12 @@ public class TerminalTemplate {
     public TerminalTemplate copy() {
         return new TerminalTemplate(name, description, workingDirectory, startCommand, commands.toArray(new String[0]));
     }
+
+    @Override
+    public String toString() {
+        if (description.isEmpty()){
+            return "%s: %s (%s)".formatted(name,commands , workingDirectory);
+        }
+        return "%s(%s): %s (%s)".formatted(name,description,commands , workingDirectory);
+    }
 }

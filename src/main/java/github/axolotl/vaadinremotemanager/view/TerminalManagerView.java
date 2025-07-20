@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -15,6 +16,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -24,6 +26,7 @@ import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
+import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
@@ -46,12 +49,71 @@ public class TerminalManagerView extends VerticalLayout {
     }
 
     private void createView() {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
         TextField searchField = new TextField();
         searchField.setWidth("50%");
         searchField.setPlaceholder("Search");
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.focus();
+
+        Button createButton = new Button("从模板中创建", VaadinIcon.PLUS.create());
+        createButton.addClickListener(event -> {
+            Dialog dialog = new Dialog();
+            dialog.setHeaderTitle("终端信息");
+
+            // 创建关闭按钮
+            Button closeButton = new Button(new Icon("lumo", "cross"), e -> dialog.close());
+
+
+            TextField nameField = new TextField("名称");
+            nameField.setWidthFull();
+
+            Select<TerminalTemplate> templateSelect = new Select<>();
+            templateSelect.setLabel("选择模板");
+            templateSelect.setWidth("100%");
+            templateSelect.setItems(TerminalTemplateService.getTemplateList());
+            templateSelect.addValueChangeListener(selectEvent -> {
+                nameField.setValue(selectEvent.getValue().getName());
+            });
+
+
+            // 保存按钮
+            Button sureCreateButton = new Button("创建", e -> {
+                TerminalInstance instance = new TerminalInstance(templateSelect.getValue());
+                instance.setName(nameField.getValue());
+
+                TerminalInstanceService.startTerminalInstance(instance);
+
+                Notification notification = new Notification("名称已更新", 3000);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                notification.open();
+
+                dialog.close();
+                reloadPages();
+            });
+
+            sureCreateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+            // 使用 VerticalLayout 布局表单内容
+            VerticalLayout formLayout = new VerticalLayout(
+                    templateSelect,
+                    nameField,
+                    sureCreateButton
+            );
+            formLayout.setAlignSelf(FlexComponent.Alignment.END, sureCreateButton); // 右对齐 [[8]]
+            formLayout.setSpacing(false);
+
+            // 设置对话框内容
+            dialog.add(formLayout);
+            dialog.setWidth("70%"); // 设置宽度为视口的70%
+            dialog.getHeader().add(closeButton);
+
+            // 打开对话框
+            dialog.open();
+        });
+        horizontalLayout.add(searchField, createButton);
+        horizontalLayout.setWidthFull();
 
 
         Grid<TerminalInstance> instanceGrid = new Grid<>();
@@ -187,7 +249,7 @@ public class TerminalManagerView extends VerticalLayout {
 
 
         addFilter(searchField, terminalInstanceGridListDataView);
-        add(searchField);
+        add(horizontalLayout);
         add(instanceGrid);
     }
 
