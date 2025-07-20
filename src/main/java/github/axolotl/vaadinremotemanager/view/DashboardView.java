@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -87,7 +88,6 @@ public class DashboardView extends VerticalLayout {
 
         statsRow.setWidthFull();
 
-
         // 在整体布局中添加间距
         HorizontalLayout operationLayout = new HorizontalLayout();//存储一些操作
 
@@ -148,7 +148,17 @@ public class DashboardView extends VerticalLayout {
         operationLayout.add(restartSystemButton);
         operationLayout.add(stopAllTernimalButton);
 
-        VerticalLayout mainContent = new VerticalLayout(header, statsRow, new Hr(), operationLayout);
+
+        operationLayout.setVisible(false);
+        ToggleButton toggleButton = new ToggleButton("我接受风险", event -> {
+            if (event.getValue()) {
+                operationLayout.setVisible(true);
+            } else {
+                operationLayout.setVisible(false);
+            }
+        });
+
+        VerticalLayout mainContent = new VerticalLayout(header, statsRow, new Hr(), toggleButton,new Hr(),operationLayout);
         mainContent.setSpacing(true);
         mainContent.setPadding(true); // 添加内边距
         mainContent.setSizeFull();
