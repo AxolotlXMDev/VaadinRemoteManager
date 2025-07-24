@@ -23,6 +23,7 @@ import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.util.ElementUtil;
+import github.axolotl.vaadinremotemanager.util.NotificationUtil;
 import github.axolotl.vaadinremotemanager.util.SystemStatusService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import jakarta.annotation.security.RolesAllowed;
@@ -92,7 +93,7 @@ public class DashboardView extends VerticalLayout {
         HorizontalLayout operationLayout = new HorizontalLayout();//存储一些操作
 
         Button stopSelfButton = new Button("关闭自身", VaadinIcon.WARNING.create(), event -> {
-            Notification.show("关闭成功！", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+            NotificationUtil.showNotification("关闭成功",NotificationVariant.LUMO_CONTRAST);
             System.exit(0);
         });
         stopSelfButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
@@ -100,7 +101,8 @@ public class DashboardView extends VerticalLayout {
 
 
         Button restartSelfButton = new Button("重启自身", VaadinIcon.REFRESH.create(), event -> {
-            Notification.show("正在重启应用，请稍候...", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+            NotificationUtil.showNotification("正在重启应用，请稍候...",NotificationVariant.LUMO_CONTRAST);
+
             if (SettingEntity.isWin()) {
                 simpleExecuteCommand("cmd.exe", "start Run.bat");
             } else {
@@ -120,7 +122,8 @@ public class DashboardView extends VerticalLayout {
 
 
         Button restartSystemButton = new Button("重启系统", VaadinIcon.WARNING.create(), event -> {
-            Notification.show("正在重启系统，请稍候...", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+            NotificationUtil.showNotification("正在重启系统，请稍候...",NotificationVariant.LUMO_CONTRAST);
+
             if (SettingEntity.isWin()) {
                 simpleExecuteCommand("cmd.exe", "shutdown -r -t 0");
             } else {
@@ -136,8 +139,10 @@ public class DashboardView extends VerticalLayout {
                     .map(TerminalInstance::getTerminal)
                     .filter(ProcessTerminal::isRunning)
                     .forEach(ProcessTerminal::stopForcibly);//全部关闭
-            Notification.show("全部终端实例已关闭", 3000, Notification.Position.MIDDLE)
+            Notification.show("", 3000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            NotificationUtil.showNotification("全部终端实例已关闭",NotificationVariant.LUMO_CONTRAST);
+
         });
         stopAllTernimalButton.addThemeVariants(ButtonVariant.LUMO_LARGE);
         stopAllTernimalButton.addThemeVariants(ButtonVariant.LUMO_ERROR);

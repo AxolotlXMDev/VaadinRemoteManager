@@ -17,6 +17,7 @@ import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.SettingService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
+import github.axolotl.vaadinremotemanager.util.NotificationUtil;
 import jakarta.annotation.security.RolesAllowed;
 
 
@@ -86,8 +87,7 @@ public class SettingView extends VerticalLayout {
 
             SettingService.setSetting(setting);
             SettingService.save();
-            Notification.show("设置已保存", 2000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            NotificationUtil.showNotificationSuccess("设置已保存");
         });
 
 

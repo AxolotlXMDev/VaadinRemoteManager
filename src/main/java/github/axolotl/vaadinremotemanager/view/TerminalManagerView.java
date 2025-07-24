@@ -27,6 +27,7 @@ import github.axolotl.vaadinremotemanager.entity.TerminalInstance;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import github.axolotl.vaadinremotemanager.service.TerminalInstanceService;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
+import github.axolotl.vaadinremotemanager.util.NotificationUtil;
 import jakarta.annotation.security.RolesAllowed;
 
 import java.util.Date;
@@ -85,9 +86,7 @@ public class TerminalManagerView extends VerticalLayout {
 
                 TerminalInstanceService.startTerminalInstance(instance);
 
-                Notification notification = new Notification("名称已更新", 3000);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                notification.open();
+                NotificationUtil.showNotificationSuccess("已创建新终端实例");
 
                 dialog.close();
                 reloadPages();
@@ -117,13 +116,15 @@ public class TerminalManagerView extends VerticalLayout {
 
 
         Grid<TerminalInstance> instanceGrid = new Grid<>();
+        GridListDataView<TerminalInstance> terminalInstanceGridListDataView = instanceGrid.setItems(TerminalInstanceService.getInstanceMap().values());
+
         instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("35%");
 
         instanceGrid.addColumn(instance -> DateUtil.formatDate(new Date(instance.getStartTime())))
-                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("12%");
+                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("10%");
         instanceGrid.sort(GridSortOrder.desc(instanceGrid.getColumnByKey("time")).build());
 
-        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("12%");
+        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("8%");
 
         instanceGrid.addComponentColumn(instance -> {
             Span span;
@@ -135,14 +136,14 @@ public class TerminalManagerView extends VerticalLayout {
                 span.getElement().getThemeList().add("badge error");
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("10%");
+        }).setHeader("运行状态").setSortable(true).setWidth("6%");
 
         instanceGrid.addComponentColumn(instance -> {
             Button jumpButton = new Button("跳转", VaadinIcon.PLAY_CIRCLE.create());
             jumpButton.addClickListener(event -> {
                 TerminalInstanceService.jumpToTerminalById(instance.getId());
             });
-            Button settingButton = new Button("编辑", VaadinIcon.COG_O.create());
+            Button settingButton = new Button("改名", VaadinIcon.COG_O.create());
             settingButton.addClickListener(event -> {
                 Dialog dialog = new Dialog();
                 dialog.setHeaderTitle("终端信息");
@@ -160,11 +161,9 @@ public class TerminalManagerView extends VerticalLayout {
                     // 更新对象属性
                     instance.setName(nameField.getValue());
 
-                    Notification notification = new Notification("名称已更新", 3000);
-                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                    notification.open();
-
+                    NotificationUtil.showNotificationSuccess("名称已更新");
                     dialog.close();
+                    reloadPages();
                 });
 
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -174,7 +173,7 @@ public class TerminalManagerView extends VerticalLayout {
                         nameField,
                         saveButton
                 );
-                formLayout.setAlignSelf(FlexComponent.Alignment.END, saveButton); // 右对齐 [[8]]
+                formLayout.setAlignSelf(Alignment.END, saveButton); // 右对齐 [[8]]
                 formLayout.setSpacing(false);
 
                 // 设置对话框内容
@@ -193,11 +192,10 @@ public class TerminalManagerView extends VerticalLayout {
                 copyInstance.setName(instance.getName() + " - 浅副本");
                 copyInstance.start(true);
 
-                reloadPages();
                 TerminalInstanceService.putTerminalInstance(copyInstance);
-                Notification notification = new Notification("已创建新终端实例", 3000);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                notification.open();
+                NotificationUtil.showNotificationSuccess("已创建新终端实例 ");
+                terminalInstanceGridListDataView.addItem(copyInstance);
+                terminalInstanceGridListDataView.refreshAll();
 
             });
             //复制一个终端 按照历史执行
@@ -216,15 +214,13 @@ public class TerminalManagerView extends VerticalLayout {
                                 throw new RuntimeException(e);
                             }
                         });
-                reloadPages();
+//                reloadPages();
                 TerminalInstanceService.putTerminalInstance(copyInstance);
-                Notification notification = new Notification("已创建新终端实例", 3000);
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                notification.open();
-
+                NotificationUtil.showNotificationSuccess("已创建新终端实例");
+                terminalInstanceGridListDataView.addItem(copyInstance);
+                terminalInstanceGridListDataView.refreshAll();
             });
 
-            //从模板启动和模板修改启动
             Button killButton = new Button("停止", VaadinIcon.WARNING.create());
             killButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
             killButton.addClickListener(event -> {
@@ -233,19 +229,26 @@ public class TerminalManagerView extends VerticalLayout {
                 reFreshGridData(instance, instanceGrid);
             });
 
+            Button removeButton = new Button("移除", VaadinIcon.MINUS_CIRCLE_O.create());
+            removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            removeButton.addClickListener(event -> {
+                instance.getTerminal().stopForcibly();
+                NotificationUtil.showNotificationSuccess("已移除终端实例");
+                TerminalInstanceService.removeTerminalInstance(instance.getId());
+                terminalInstanceGridListDataView.removeItem(instance);
+            });
+
             jumpButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             settingButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             shallowCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             deepCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(jumpButton, settingButton, shallowCopyButton, deepCopyButton, killButton);
-        }).setHeader("操作").setWidth("130%");
+            removeButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            return new HorizontalLayout(jumpButton, settingButton, shallowCopyButton, deepCopyButton, removeButton);
+        }).setHeader("操作").setWidth("28%");
 
         instanceGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         instanceGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
-
-
-        GridListDataView<TerminalInstance> terminalInstanceGridListDataView = instanceGrid.setItems(TerminalInstanceService.getInstanceMap().values());
 
 
         addFilter(searchField, terminalInstanceGridListDataView);

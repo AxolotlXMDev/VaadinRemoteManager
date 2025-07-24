@@ -20,6 +20,9 @@ public class TerminalInstanceService {
     @Getter
     private static ArrayList<TerminalInstance> instancesList = new ArrayList<>();
 
+    /**
+     * 在对map进行修改后调用该方法
+     */
     public static void reloadList() {
         instancesList = new ArrayList<>(TerminalInstanceService.getInstanceMap().values());
         instancesList.sort((t1, t2) -> Math.toIntExact(t2.getStartTime() - t1.getStartTime()));
@@ -42,5 +45,13 @@ public class TerminalInstanceService {
 
     public static void jumpToTerminalById(String terminalId) {
         UI.getCurrent().navigate(TerminalInstanceView.class, new RouteParameters("terminalId", terminalId));
+    }
+
+    public static void removeTerminalInstance(String id) {
+        TerminalInstance terminalInstance = instanceMap.get(id);
+        if (terminalInstance != null) {
+            instanceMap.remove(id);
+            reloadList();
+        }
     }
 }

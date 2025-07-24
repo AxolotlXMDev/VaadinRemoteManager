@@ -22,6 +22,7 @@ import com.vaadin.flow.router.Route;
 import dczx.axolotl.terminal.ProcessTerminal;
 import dczx.axolotl.util.DateUtil;
 import github.axolotl.vaadinremotemanager.VaadinRemoteManagerApplication;
+import github.axolotl.vaadinremotemanager.util.NotificationUtil;
 import github.axolotl.vaadinremotemanager.util.ProcessVOService;
 import github.axolotl.vaadinremotemanager.util.ViewUtil;
 import github.axolotl.vaadinremotemanager.entity.ProcessEntity;
@@ -77,8 +78,10 @@ public class ProcessView extends VerticalLayout {
 
         processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("40%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用")
+                .setComparator(Comparator.comparingDouble(ProcessEntity::getCpuUsage))
                 .setSortable(true).setWidth("4%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用")
+                .setComparator(Comparator.comparingDouble(ProcessEntity::getMemoryUsage))
                 .setSortable(true).setWidth("4%");
 
 
@@ -159,7 +162,8 @@ public class ProcessView extends VerticalLayout {
             shallowKillButton.addClickListener(event -> {
                 ProcessTerminal.killProcess(process.getPid(), false);
                 processList.remove(process);
-                Notification.show("进程已终止: " + process.getName(), 1200, Notification.Position.MIDDLE);
+                NotificationUtil.showNotificationSuccess("进程已终止: " + process.getName());
+                NotificationUtil.showNotification("进程已终止: " + process.getName(),NotificationVariant.LUMO_CONTRAST);
                 reloadGrid(processGrid, searchField);
 
             });

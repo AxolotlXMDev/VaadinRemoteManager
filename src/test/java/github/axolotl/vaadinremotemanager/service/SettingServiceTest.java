@@ -13,7 +13,7 @@ class SettingServiceTest {
     @Test
     public void testLoad() {
         System.out.println("SettingService.getSetting() = " + SettingService.getSetting());
-        SettingService.getSetting().setDefaultTerminalName("ABC");
+//        SettingService.getSetting().setDefaultTerminalName("ABC");
         SettingService.save();
         System.out.println("Updated SettingService.getSetting() = " + SettingService.getSetting());
     }
