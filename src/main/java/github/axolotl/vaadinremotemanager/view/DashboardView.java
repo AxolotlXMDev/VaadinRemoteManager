@@ -139,8 +139,6 @@ public class DashboardView extends VerticalLayout {
                     .map(TerminalInstance::getTerminal)
                     .filter(ProcessTerminal::isRunning)
                     .forEach(ProcessTerminal::stopForcibly);//全部关闭
-            Notification.show("", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             NotificationUtil.showNotification("全部终端实例已关闭",NotificationVariant.LUMO_CONTRAST);
 
         });

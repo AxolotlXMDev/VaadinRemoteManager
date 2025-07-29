@@ -74,19 +74,17 @@ public class ProcessView extends VerticalLayout {
         processList.sort((p1, p2) -> Math.toIntExact(p2.getPid() - p1.getPid()));
 
         Grid<ProcessEntity> processGrid = new Grid<>();
-        processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("3%");
+        processGrid.addColumn(ProcessEntity::getPid).setHeader("pid").setSortable(true).setWidth("8%");
 
-        processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("40%");
+        processGrid.addColumn(ProcessEntity::getName).setHeader("名称").setSortable(true).setWidth("32%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getCpuUsage() * 100)).setHeader("CPU占用")
                 .setComparator(Comparator.comparingDouble(ProcessEntity::getCpuUsage))
-                .setSortable(true).setWidth("4%");
+                .setSortable(true).setWidth("8%");
         processGrid.addColumn(p -> "%.2f".formatted(p.getMemoryUsage())).setHeader("内存占用")
                 .setComparator(Comparator.comparingDouble(ProcessEntity::getMemoryUsage))
-                .setSortable(true).setWidth("4%");
+                .setSortable(true).setWidth("10%");
 
-
-        processGrid.addComponentColumn(process -> {
-
+        /*processGrid.addComponentColumn(process -> {
             Span span;
             switch (process.getStatus()) {
                 case OSProcess.State.RUNNING -> {
@@ -131,7 +129,7 @@ public class ProcessView extends VerticalLayout {
                 }
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("2%");
+        }).setHeader("运行状态").setSortable(true).setWidth("6%");*/
 
         // Add kill process button column with red background
         processGrid.addComponentColumn(process -> {
@@ -180,7 +178,7 @@ public class ProcessView extends VerticalLayout {
             shallowKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             deepKillButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             return new HorizontalLayout(infoButton, shallowKillButton, deepKillButton);
-        }).setHeader("操作").setWidth("15%");
+        }).setHeader("操作").setWidth("45%");
 
         processGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         processGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);

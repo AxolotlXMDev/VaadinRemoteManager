@@ -127,12 +127,12 @@ public class TemplateView extends VerticalLayout {
 
         List<TerminalTemplate> templateList = TerminalTemplateService.getTemplateList();
         Grid<TerminalTemplate> templateGrid = new Grid<>();
-        templateGrid.addColumn(TerminalTemplate::getName).setHeader("名称").setSortable(true).setWidth("7%");
+        templateGrid.addColumn(TerminalTemplate::getName).setHeader("名称").setSortable(true).setWidth("3%");
 
 
-        templateGrid.addColumn(TerminalTemplate::getDescription).setHeader("描述").setSortable(true).setWidth("15%");
-        templateGrid.addColumn(TerminalTemplate::getCommands).setHeader("命令").setSortable(true).setWidth("22%");
-        templateGrid.addColumn(TerminalTemplate::getWorkingDirectory).setHeader("工作目录").setSortable(true).setWidth("22%");
+        templateGrid.addColumn(TerminalTemplate::getDescription).setHeader("描述").setSortable(true).setWidth("5%");
+        templateGrid.addColumn(TerminalTemplate::getCommands).setHeader("命令").setSortable(true).setWidth("10%");
+        templateGrid.addColumn(TerminalTemplate::getWorkingDirectory).setHeader("工作目录").setSortable(true).setWidth("15%");
 
         GridListDataView<TerminalTemplate> terminalTemplateGridListDataView = templateGrid.setItems(templateList);
 
@@ -248,7 +248,7 @@ public class TemplateView extends VerticalLayout {
             luanchButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
             return new HorizontalLayout(infoButton, copyButton, removeButton, luanchButton);
-        }).setHeader("操作").setWidth("20%");
+        }).setHeader("操作").setWidth("25%");
 
         templateGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         templateGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);

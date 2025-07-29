@@ -118,13 +118,13 @@ public class TerminalManagerView extends VerticalLayout {
         Grid<TerminalInstance> instanceGrid = new Grid<>();
         GridListDataView<TerminalInstance> terminalInstanceGridListDataView = instanceGrid.setItems(TerminalInstanceService.getInstanceMap().values());
 
-        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("35%");
+        instanceGrid.addColumn(TerminalInstance::getName).setHeader("名称").setSortable(true).setWidth("15%");
 
-        instanceGrid.addColumn(instance -> DateUtil.formatDate(new Date(instance.getStartTime())))
-                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("10%");
+        instanceGrid.addColumn(instance -> DateUtil.formatDate(new Date(instance.getStartTime()), "MM-dd hh:mm:ss"))
+                .setHeader("创建时间").setKey("time").setSortable(true).setWidth("8%");
         instanceGrid.sort(GridSortOrder.desc(instanceGrid.getColumnByKey("time")).build());
 
-        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("8%");
+        instanceGrid.addColumn(instance -> instance.getTemplate().getName()).setHeader("父模板").setSortable(true).setWidth("6%");
 
         instanceGrid.addComponentColumn(instance -> {
             Span span;
@@ -136,15 +136,15 @@ public class TerminalManagerView extends VerticalLayout {
                 span.getElement().getThemeList().add("badge error");
             }
             return span;
-        }).setHeader("运行状态").setSortable(true).setWidth("6%");
+        }).setHeader("运行状态").setSortable(true).setWidth("4%");
 
         instanceGrid.addComponentColumn(instance -> {
             Button jumpButton = new Button("跳转", VaadinIcon.PLAY_CIRCLE.create());
             jumpButton.addClickListener(event -> {
                 TerminalInstanceService.jumpToTerminalById(instance.getId());
             });
-            Button settingButton = new Button("改名", VaadinIcon.COG_O.create());
-            settingButton.addClickListener(event -> {
+            Button renameButton = new Button("改名", VaadinIcon.COG_O.create());
+            renameButton.addClickListener(event -> {
                 Dialog dialog = new Dialog();
                 dialog.setHeaderTitle("终端信息");
 
@@ -239,13 +239,13 @@ public class TerminalManagerView extends VerticalLayout {
             });
 
             jumpButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            settingButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+            renameButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             shallowCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             deepCopyButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             killButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
             removeButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-            return new HorizontalLayout(jumpButton, settingButton, shallowCopyButton, deepCopyButton, removeButton);
-        }).setHeader("操作").setWidth("28%");
+            return new HorizontalLayout(jumpButton, killButton, removeButton, shallowCopyButton, deepCopyButton, renameButton);
+        }).setHeader("操作").setWidth("40%");
 
         instanceGrid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
         instanceGrid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
