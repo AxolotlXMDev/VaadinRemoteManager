@@ -1,10 +1,12 @@
 package github.axolotl.vaadinremotemanager.service;
 
-import dczx.axolotl.util.FileUtil;
+import dczx.axolotl.util.file.FilesUtil;
 import github.axolotl.vaadinremotemanager.entity.SettingEntity;
 import github.axolotl.vaadinremotemanager.util.data.SettingDataUtil;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.IOException;
 
 /**
  * @author AxolotlXM
@@ -15,10 +17,15 @@ public class SettingService {
     @Getter
     @Setter
     private static SettingEntity setting;
-    private static final SettingDataUtil settingUtil = new SettingDataUtil(FileUtil.keepFileExists("./data/setting.json"));
+    private static final SettingDataUtil settingUtil;
 
     static {
-        settingUtil.loadEntity();
+            try {
+                    settingUtil = new SettingDataUtil(FilesUtil.keepFileExists("./data/setting.json"));
+            } catch (IOException e) {
+                    throw new RuntimeException(e);
+            }
+            settingUtil.loadEntity();
         setting = settingUtil.getSetting();
     }
     public static void save() {

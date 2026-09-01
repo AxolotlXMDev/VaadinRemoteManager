@@ -36,6 +36,7 @@ class SecurityConfig extends VaadinWebSecurity {
                 .build();
         var admin = User.withUsername("admin")
                 .password("{noop}AXM-e2beaf10-8ef0-4bc2-88a3-cad6489a0286-2daf98c4")
+                //这是一段临时生成的uuid，不要尝试用这个来登录我的其他账户(那是徒劳的)
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user, admin);

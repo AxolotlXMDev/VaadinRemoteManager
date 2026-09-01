@@ -1,10 +1,11 @@
 package github.axolotl.vaadinremotemanager.util.data;
 
-import dczx.axolotl.util.FileUtil;
+import dczx.axolotl.util.file.FilesUtil;
 import github.axolotl.vaadinremotemanager.entity.TerminalTemplate;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,16 +15,24 @@ import static org.junit.jupiter.api.Assertions.*;
  * @since 2025/7/18 14:03
  */
 class SettingDataUtilTest {
-    static File file = FileUtil.keepFileExists("./test/setting.json");
+        static File file;
 
-    @Test
-    public void testLoad() {
-        SettingDataUtil settingUtil = new SettingDataUtil(file);
-        settingUtil.loadEntity();
-        System.out.println("settingUtil.getSetting() = " + settingUtil.getSetting());
-        settingUtil.getSetting().setDefaultTerminalName("ABC");
+        static {
+                try {
+                        file = FilesUtil.keepFileExists("./test/setting.json");
+                } catch (IOException e) {
+                        throw new RuntimeException(e);
+                }
+        }
 
-        settingUtil.saveEntity();
-    }
+        @Test
+        public void testLoad() {
+                SettingDataUtil settingUtil = new SettingDataUtil(file);
+                settingUtil.loadEntity();
+                System.out.println("settingUtil.getSetting() = " + settingUtil.getSetting());
+                settingUtil.getSetting().setDefaultTerminalName("ABC");
+
+                settingUtil.saveEntity();
+        }
 
 }

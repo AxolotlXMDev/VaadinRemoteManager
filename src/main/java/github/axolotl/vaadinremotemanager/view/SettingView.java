@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.view;
 
+import com.vaadin.componentfactory.ToggleButton;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
@@ -35,6 +36,11 @@ public class SettingView extends VerticalLayout {
 
         setSizeFull();
 
+
+        ToggleButton isSkipWebLaunch = new ToggleButton("跳过Web启动");
+        isSkipWebLaunch.setValue(setting.isSkipWebLaunch());
+        isSkipWebLaunch.setWidthFull();
+
         TextField defaultWorkingDirectoryField = new TextField("默认工作路径");
         defaultWorkingDirectoryField.setValue(setting.getDefaultWorkingDirectory());
         defaultWorkingDirectoryField.setWidthFull();
@@ -50,6 +56,10 @@ public class SettingView extends VerticalLayout {
         IntegerField defaultRefreshDelayField = new IntegerField("默认终端刷新间隔");
         defaultRefreshDelayField.setValue(setting.getDefaultRefreshDelay());
         defaultRefreshDelayField.setWidthFull();
+
+        IntegerField autoCloseTimeField = new IntegerField("启动后关闭的时间(单位: 秒, 数值小于零不不启用该功能)");
+        autoCloseTimeField.setValue(setting.getAutoCloseTime());
+        autoCloseTimeField.setWidthFull();
 
         Span selfStartListSpan = new Span(("自启动终端列表"));
         MultiSelectListBox<TerminalTemplate> selfStartList = new MultiSelectListBox<>();
@@ -79,10 +89,12 @@ public class SettingView extends VerticalLayout {
 
         Button saveButton = new Button("保存", VaadinIcon.FILE_CODE.create());
         saveButton.addClickListener(event -> {
+            setting.setSkipWebLaunch(isSkipWebLaunch.getValue());
             setting.setDefaultWorkingDirectory(defaultWorkingDirectoryField.getValue());
             setting.setDefaultStartCommand(defaultStartCommandField.getValue());
             setting.setDefaultTerminalName(defaultTerminalNameField.getValue());
             setting.setDefaultRefreshDelay(defaultRefreshDelayField.getValue());
+            setting.setAutoCloseTime(autoCloseTimeField.getValue());
             setting.setSelfStartList(selfStartList.getSelectedItems().stream().map(TerminalTemplate::getId).toList());
 
             SettingService.setSetting(setting);
@@ -91,10 +103,12 @@ public class SettingView extends VerticalLayout {
         });
 
 
+        add(isSkipWebLaunch);
         add(defaultWorkingDirectoryField);
         add(defaultStartCommandField);
         add(defaultTerminalNameField);
         add(defaultRefreshDelayField);
+        add(autoCloseTimeField);
         add(new Hr());
         add(selfStartListSpan);
         add(selfStartList);

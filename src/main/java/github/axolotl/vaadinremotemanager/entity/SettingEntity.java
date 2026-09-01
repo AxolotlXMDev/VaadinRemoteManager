@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import github.axolotl.vaadinremotemanager.service.TerminalTemplateService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +27,8 @@ public class SettingEntity {
     private String defaultTerminalName = "%TemplateName%-%hh:mm:ss%";
     private List<String> selfStartList = List.of();//自启动模板Id列表
     private int defaultRefreshDelay = 800;
+    private int autoCloseTime = -1;//自动关闭
+    private boolean skipWebLaunch = false; //跳过Web启动
 
     public static boolean isWin() {
         String os = System.getProperty("os.name").toLowerCase();
