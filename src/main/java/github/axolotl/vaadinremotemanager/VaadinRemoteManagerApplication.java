@@ -1,5 +1,6 @@
 package github.axolotl.vaadinremotemanager;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.Theme;
@@ -22,7 +23,7 @@ import java.util.List;
 @SpringBootApplication
 @EnableScheduling
 @Push
-@Theme("my-theme")
+@StyleSheet("context://themes/my-theme/styles.css")
 public class VaadinRemoteManagerApplication implements AppShellConfigurator, SpringApplicationRunListener {
 
     @Getter

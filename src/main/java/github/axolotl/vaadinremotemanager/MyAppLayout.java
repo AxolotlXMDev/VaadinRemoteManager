@@ -2,6 +2,7 @@ package github.axolotl.vaadinremotemanager;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
@@ -20,6 +21,7 @@ import github.axolotl.vaadinremotemanager.view.*;
  */
 //用于定义应用程序的布局
 @Layout
+@StyleSheet("context://themes/my-theme/styles.css")
 @AnonymousAllowed
 public class MyAppLayout extends AppLayout {
 
