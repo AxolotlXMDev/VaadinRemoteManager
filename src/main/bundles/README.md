@@ -13,7 +13,7 @@ Frontend development bundle is automatically updated when needed:
 
 If your project development needs a hot deployment of the frontend changes, 
 you can switch Flow to use Vite development server (default in Vaadin 23.3 and earlier versions):
-- set `vaadin.frontend.hotdeploy=true` in `application.properties`
+- set `vaadin.frontend.hotdeploy=true` in `application.yaml`
 - configure `vaadin-maven-plugin`:
 ```
    <configuration>
